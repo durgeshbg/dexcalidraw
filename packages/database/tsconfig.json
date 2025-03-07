@@ -1,0 +1,3 @@
+{
+  "extends": "@dexcalidraw/typescript-config/base.json"
+}
