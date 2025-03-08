@@ -1,7 +1,8 @@
 {
   "extends": "@dexcalidraw/typescript-config/base.json",
+  "exclude": ["dist", "node_modules"],
+  "include": ["src/**/*.ts", "src/**/*.json"],
   "compilerOptions": {
-    "outDir": "dist",
-    "rootDir": "src"
+    "outDir": "./dist"
   }
 }

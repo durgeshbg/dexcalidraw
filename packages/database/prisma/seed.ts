@@ -10,7 +10,7 @@ async function main() {
 
   const users: User[] = [];
   const messages: Message[] = [];
-  const rooms = [];
+  const rooms: Room[] = [];
 
   const USER_COUNT = 10;
   const ROOMS_COUNT = 3;
@@ -34,6 +34,7 @@ async function main() {
         adminId: users[users.length - 1 - i]?.id!,
         users: {
           connect: [
+            { id: users[users.length - 1 - i]?.id },
             { id: users[getRandomId(7)]?.id },
             { id: users[getRandomId(7)]?.id },
             { id: users[getRandomId(7)]?.id },
