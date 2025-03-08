@@ -72,3 +72,17 @@ export const signinController = async (req: Request, res: Response) => {
   }
   return;
 };
+
+export const getUserInfo = async (req: Request, res: Response) => {
+  const user = await prisma.user.findFirst({
+    where: { id: req.user?.id },
+    select: { name: true, email: true, adminRooms: { select: { name: true } }, rooms: { select: { name: true } } },
+  });
+
+  if (!user) {
+    res.status(404).json({ error: 'User not found' });
+    return;
+  }
+
+  res.status(200).json(user);
+};
