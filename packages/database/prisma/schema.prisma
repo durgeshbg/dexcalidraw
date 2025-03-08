@@ -27,7 +27,7 @@ model Message {
   roomId    String
   authorId  String
   adminId   String
-  room      Room     @relation(fields: [roomId], references: [id])
+  room      Room     @relation(fields: [roomId], references: [id], onDelete: Cascade)
   author    User     @relation(fields: [authorId], references: [id])
 }
 
