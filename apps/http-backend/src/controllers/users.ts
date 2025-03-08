@@ -76,7 +76,12 @@ export const signinController = async (req: Request, res: Response) => {
 export const getUserInfo = async (req: Request, res: Response) => {
   const user = await prisma.user.findFirst({
     where: { id: req.user?.id },
-    select: { name: true, email: true, adminRooms: { select: { name: true } }, rooms: { select: { name: true } } },
+    select: {
+      name: true,
+      email: true,
+      adminRooms: { select: { name: true, id: true } },
+      rooms: { select: { name: true, id: true } },
+    },
   });
 
   if (!user) {
