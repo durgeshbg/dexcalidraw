@@ -26,9 +26,8 @@ model Message {
   updatedAt DateTime @updatedAt
   roomId    String
   authorId  String
-  adminId   String
   room      Room     @relation(fields: [roomId], references: [id], onDelete: Cascade)
-  author    User     @relation(fields: [authorId], references: [id])
+  author    User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
 }
 
 model Room {
@@ -39,5 +38,5 @@ model Room {
   messages  Message[]
   users     User[]
   adminId   String
-  admin     User      @relation("RoomAdmin", fields: [adminId], references: [id])
+  admin     User      @relation("RoomAdmin", fields: [adminId], references: [id], onDelete: Cascade)
 }

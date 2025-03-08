@@ -15,12 +15,19 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@ngneat/falso": "^7.3.0",
     "@prisma/client": "^6.4.1",
+    "bcrypt": "^5.1.1",
     "nodemon": "^3.0.1",
-    "prisma": "^6.4.1"
+    "prisma": "^6.4.1",
+    "ts-node": "^10.9.2"
   },
   "devDependencies": {
     "@dexcalidraw/typescript-config": "workspace:*",
+    "@types/bcrypt": "^5.0.2",
     "@types/node": "^22.13.9"
+  },
+  "prisma": {
+    "seed": "ts-node prisma/seed.ts"
   }
 }
