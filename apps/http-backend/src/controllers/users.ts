@@ -37,7 +37,9 @@ export const signupController = async (req: Request, res: Response) => {
     res.status(201).json({ token });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: 'An error occurred while creating the user' });
+    res
+      .status(500)
+      .json({ error: 'An error occurred while creating the user' });
   }
   return;
 };
@@ -58,7 +60,7 @@ export const signinController = async (req: Request, res: Response) => {
       res.status(404).json({ error: 'User not found' });
       return;
     }
-    const passwordMatch = bcrypt.compare(password, user.password);
+    const passwordMatch = await bcrypt.compare(password, user.password);
     if (!passwordMatch) {
       res.status(401).json({ error: 'Invalid password' });
       return;
