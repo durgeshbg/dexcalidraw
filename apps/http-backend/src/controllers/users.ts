@@ -37,9 +37,7 @@ export const signupController = async (req: Request, res: Response) => {
     res.status(201).json({ token });
   } catch (error) {
     console.error(error);
-    res
-      .status(500)
-      .json({ error: 'An error occurred while creating the user' });
+    res.status(500).json({ error: 'Email already exists' });
   }
   return;
 };
