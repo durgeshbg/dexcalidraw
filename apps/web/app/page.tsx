@@ -1,4 +1,5 @@
 'use client';
+import HomeComponent from '@/components/HomeComponent';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 
@@ -11,5 +12,9 @@ export default function Home() {
     }
   }, []);
 
-  return <div>Home</div>;
+  return (
+    <div className='flex flex-col items-center justify-center min-h-screen bg-stone-900'>
+      <HomeComponent />
+    </div>
+  );
 }
