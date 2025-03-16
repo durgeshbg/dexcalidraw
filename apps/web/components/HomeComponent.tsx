@@ -1,3 +1,4 @@
+'use client';
 import * as React from 'react';
 import Navbar from './Navbar';
 import Canvas from './Canvas';
@@ -26,10 +27,7 @@ export default function HomeComponent() {
         selectedShapeType={selectedShapeType}
         setSelectedShapeType={setSelectedShapeType}
       />
-      <Canvas
-        canvasInstance={canvasInstance}
-        setCanvasInstance={setCanvasInstance}
-      />
+      <Canvas setCanvasInstance={setCanvasInstance} />
     </div>
   );
 }

@@ -5,11 +5,9 @@ export interface ICanvasProps {
   setCanvasInstance: React.Dispatch<
     React.SetStateAction<CanvasClass | undefined>
   >;
-  canvasInstance: CanvasClass | undefined;
 }
 
 export default function Canvas({
-  canvasInstance,
   setCanvasInstance,
 }: ICanvasProps) {
   const canvasRef = React.useRef<HTMLCanvasElement>(null);
