@@ -75,8 +75,17 @@ export default function SignIn() {
               />
             </Label>
           </CardContent>
-          <CardContent>
+          <CardContent className='flex gap-5'>
             <Button type='submit'>Submit</Button>
+            <Button
+              onClick={() => {
+                setEmail('samran.vos@gmail.com');
+                setPassword('123456789');
+              }}
+              type='button'
+            >
+              Test Credentials
+            </Button>
           </CardContent>
           <br />
           <CardFooter>
