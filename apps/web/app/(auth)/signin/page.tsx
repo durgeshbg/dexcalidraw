@@ -47,7 +47,11 @@ export default function SignIn() {
 
   return (
     <div>
-      <h1 className='text-3xl text-center mt-32'>Sign In</h1>
+      <div>
+        <h1 className='text-5xl text-center mt-10'>Decalidraw</h1>
+        <p className='text-center'>Your collbrative thinking platform</p>
+      </div>
+      <h3 className='text-3xl text-center mt-32'>Sign In</h3>
       <form onSubmit={handleSubmit}>
         <Card className='w-[450px] mx-auto mt-10 shadow-lg'>
           <CardHeader>
