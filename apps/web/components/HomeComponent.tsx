@@ -1,14 +1,15 @@
 'use client';
 import * as React from 'react';
-import Navbar from './Navbar';
 import Canvas from './Canvas';
 import { CanvasClass } from '@/lib/CanvasClass';
 import { SelectedShapeType } from '@/lib/types';
 
-export default function HomeComponent() {
+export default function HomeComponent({
+  selectedShapeType,
+}: {
+  selectedShapeType: SelectedShapeType;
+}) {
   const [canvasInstance, setCanvasInstance] = React.useState<CanvasClass>();
-  const [selectedShapeType, setSelectedShapeType] =
-    React.useState<SelectedShapeType>('rectangle');
 
   if (canvasInstance) {
     canvasInstance.addHandlers();
@@ -19,14 +20,10 @@ export default function HomeComponent() {
     if (canvasInstance) {
       canvasInstance.setShape(selectedShapeType);
     }
-  }, [selectedShapeType]);
+  }, [selectedShapeType, canvasInstance]);
 
   return (
     <div>
-      <Navbar
-        selectedShapeType={selectedShapeType}
-        setSelectedShapeType={setSelectedShapeType}
-      />
       <Canvas setCanvasInstance={setCanvasInstance} />
     </div>
   );

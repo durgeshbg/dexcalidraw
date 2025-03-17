@@ -14,7 +14,7 @@ export function handleNetworkError(e: AxiosError) {
   if (response?.data) {
     const { data } = response as AxiosResponse;
 
-    if (data.error instanceof ZodError) {
+    if (data.error as ZodError) {
       if (data.error.issues) {
         data.error.issues.map((issue: ZodIssue) => {
           toast.error(`${issue.path[0]} - ${issue.message}`);

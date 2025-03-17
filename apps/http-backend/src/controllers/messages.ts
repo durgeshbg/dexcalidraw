@@ -22,14 +22,16 @@ export const createMessage = async (req: Request, res: Response) => {
     return;
   }
   const { content } = data;
-  const message = await prisma.message.create({ data: { content, authorId: req.user?.id!, roomId: room.id } });
+  const message = await prisma.message.create({
+    data: { content, authorId: req.user?.id!, roomId: room.id },
+  });
   res.status(201).json({ message });
 };
 
 export const getAllMessages = async (req: Request, res: Response) => {
   const { roomId } = req.params;
   const room = await prisma.room.findUnique({
-    where: { id: roomId, users: { some: { id: req.user?.id! } } },
+    where: { id: roomId },
   });
   if (!room) {
     res.status(404).json({ error: 'Room not found' });
@@ -37,7 +39,12 @@ export const getAllMessages = async (req: Request, res: Response) => {
   }
   const messages = await prisma.message.findMany({
     where: { roomId },
-    select: { id: true, content: true, createdAt: true, author: { select: { id: true, name: true } } },
+    select: {
+      id: true,
+      content: true,
+      createdAt: true,
+      author: { select: { id: true, name: true } },
+    },
     orderBy: { createdAt: 'asc' },
   });
   res.status(200).json({ messages });

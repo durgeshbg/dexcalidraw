@@ -91,3 +91,27 @@ export const getUserInfo = async (req: Request, res: Response) => {
 
   res.status(200).json(user);
 };
+
+export const getUsers = async (req: Request, res: Response) => {
+  const s = req?.query?.s as string;
+
+  if (s) {
+    const users = await prisma.user.findMany({
+      where: {
+        OR: [
+          { email: { contains: s, mode: 'insensitive' } },
+          { name: { contains: s, mode: 'insensitive' } },
+        ],
+        id: { not: req.user?.id },
+      },
+      select: { name: true, id: true, email: true },
+    });
+    res.status(200).json({ users });
+    return;
+  } else {
+    const users = await prisma.user.findMany({
+      select: { name: true, id: true, email: true },
+    });
+    res.status(200).json({ users });
+  }
+};

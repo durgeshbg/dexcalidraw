@@ -15,15 +15,20 @@ export const createRoom = async (req: Request, res: Response) => {
   }
 
   const { name } = data;
-  const room = await prisma.room.create({ data: { name, adminId: req.user?.id! } });
-  res.status(201).json({ roomId: room.id, name });
+  const room = await prisma.room.create({
+    data: { name, adminId: req.user?.id! },
+  });
+  res.status(201).json({ room });
   return;
 };
 
 export const getUserRooms = async (req: Request, res: Response) => {
   const rooms = await prisma.room.findMany({
     where: {
-      OR: [{ adminId: req.user?.id }, { users: { some: { id: req.user?.id } } }],
+      OR: [
+        { adminId: req.user?.id },
+        { users: { some: { id: req.user?.id } } },
+      ],
     },
   });
   res.status(200).json({ rooms });
@@ -62,7 +67,10 @@ export const getRoom = async (req: Request, res: Response) => {
     return;
   }
 
-  const room = await prisma.room.findUnique({ where: { id: roomId }, include: { users: true, messages: true } });
+  const room = await prisma.room.findUnique({
+    where: { id: roomId },
+    include: { users: true, messages: true },
+  });
 
   if (!room) {
     res.status(404).json({ error: 'Room not found' });
@@ -93,7 +101,9 @@ export const addUserToRoom = async (req: Request, res: Response) => {
   }
 
   if (room.adminId !== req.user?.id) {
-    res.status(403).json({ error: 'You are not allowed to add users to this room' });
+    res
+      .status(403)
+      .json({ error: 'You are not allowed to add users to this room' });
     return;
   }
 
@@ -127,7 +137,9 @@ export const removeUserFromRoom = async (req: Request, res: Response) => {
   }
 
   if (room.adminId !== req.user?.id) {
-    res.status(403).json({ error: 'You are not allowed to remove users from this room' });
+    res
+      .status(403)
+      .json({ error: 'You are not allowed to remove users from this room' });
     return;
   }
 
