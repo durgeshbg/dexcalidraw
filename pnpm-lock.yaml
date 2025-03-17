@@ -7,6 +7,10 @@ settings:
 importers:
 
   .:
+    dependencies:
+      '@netlify/plugin-nextjs':
+        specifier: ^5.10.0
+        version: 5.10.0
     devDependencies:
       prettier:
         specifier: ^3.5.3
@@ -568,6 +572,10 @@ packages:
   '@mapbox/node-pre-gyp@1.0.11':
     resolution: {integrity: sha512-Yhlar6v9WQgUp/He7BdgzOz8lqMQ8sU+jkCq7Wx8Myc5YFJLbEe7lgui/V7G1qB1DJykHSGwreceSaD60Y0PUQ==}
     hasBin: true
+
+  '@netlify/plugin-nextjs@5.10.0':
+    resolution: {integrity: sha512-h2ugfCAQRhp6NIYABW+20AvVkrM/ReuELBfgkH+5DALfrKrsQXYeS1YPZi9y4bCfNFj8Zxdhu4DtuVFDiUONiA==}
+    engines: {node: '>=18.0.0'}
 
   '@next/env@15.2.2':
     resolution: {integrity: sha512-yWgopCfA9XDR8ZH3taB5nRKtKJ1Q5fYsTOuYkzIIoS8TJ0UAUKAGF73JnGszbjk2ufAQDj6mDdgsJAFx5CLtYQ==}
@@ -3107,6 +3115,8 @@ snapshots:
     transitivePeerDependencies:
       - encoding
       - supports-color
+
+  '@netlify/plugin-nextjs@5.10.0': {}
 
   '@next/env@15.2.2': {}
 
