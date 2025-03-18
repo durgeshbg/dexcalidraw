@@ -49,9 +49,14 @@ export default function SignUp() {
 
   return (
     <div>
-      <div>
-        <h1 className='text-5xl text-center mt-10'>Decalidraw</h1>
-        <p className='text-center' >Your collbrative thinking platform</p>
+      <div className='flex justify-center align-center gap-5 mt-10'>
+        <h1 className='text-5xl'>Decalidraw</h1>
+        <div className='flex flex-col justify-center align-center'>
+          <p className='text-sm'>Your</p>
+          <p className='text-sm'>collbrative</p>
+          <p className='text-sm'>thinking</p>
+          <p className='text-sm'>platform</p>
+        </div>
       </div>
       <h3 className='text-3xl text-center mt-32'>Sign Up</h3>
       <form onSubmit={handleSubmit}>

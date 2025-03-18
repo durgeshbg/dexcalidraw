@@ -1,6 +1,6 @@
 import { Room as RoomType } from '@/lib/types';
 import * as React from 'react';
-import { Card } from './ui/card';
+import { Card, CardTitle, CardFooter } from './ui/card';
 import { redirect } from 'next/navigation';
 import { DeleteIcon } from 'lucide-react';
 import { Button } from './ui/button';
@@ -35,12 +35,13 @@ export default function Room(props: IRoomProps) {
     }
   };
   return (
-    <div className='flex flex-col items-center justify-center gap-3'>
+    <div className='flex flex-col items-center justify-center gap-3 overflow-x-auto'>
       <Card
         onClick={() => redirect(`/rooms/${props.room.id}`)}
-        className='w-52 h-52 flex items-center justify-center bg-stone-900 text-white text-xl hover:bg-stone-800 cursor-pointer'
+        className='w-52 h-52 flex items-center justify-center bg-stone-900 text-white text-xl hover:bg-stone-800 cursor-pointer rounded-full flex-col'
       >
-        {props.room.name}
+        <CardTitle className='text-7xl mt-8'>{props.room.name[0]}</CardTitle>
+        <CardFooter className='text-sm'>{props.room.name}</CardFooter>
       </Card>
       <Button onClick={handleDelete} className='bg-red-500 hover:bg-red-600'>
         <DeleteIcon className='size-5 text-white' />
