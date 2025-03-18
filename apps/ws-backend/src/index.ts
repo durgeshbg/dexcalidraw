@@ -2,6 +2,9 @@ import WebSocket, { WebSocketServer } from 'ws';
 import dotenv from 'dotenv';
 import { JwtPayload, verify } from 'jsonwebtoken';
 import axios from 'axios';
+import cors from 'cors';
+import express from 'express';
+import http from 'http';
 
 dotenv.config();
 
@@ -15,10 +18,12 @@ type MessageObj = {
 
 type PasrsedMessageType = { type: 'message'; message: MessageObj };
 
+const app = express();
+app.use(cors());
+
 const clients = new Map<string, [WebSocket, string]>();
-const wss = new WebSocketServer({
-  port: 8080,
-});
+const server = http.createServer(app);
+const wss = new WebSocketServer({ server });
 
 wss.on('connection', async function connection(ws: WebSocket, req) {
   const token = req.url?.split('?')[1]?.split('=')[1];
@@ -91,3 +96,7 @@ const verifyToken = async (token: string) => {
     }
   }
 };
+
+server.listen(8080, () => {
+  console.log(`Server running on: 8080`);
+});
