@@ -79,8 +79,10 @@ export default function SignIn() {
               />
             </Label>
           </CardContent>
-          <CardContent className='flex gap-5'>
+          <CardContent>
             <Button type='submit'>Submit</Button>
+          </CardContent>
+          <CardContent className='flex gap-5'>
             <Button
               onClick={() => {
                 setEmail('samran.vos@gmail.com');
@@ -88,7 +90,16 @@ export default function SignIn() {
               }}
               type='button'
             >
-              Test Credentials
+              Test Credentials - 1
+            </Button>
+            <Button
+              onClick={() => {
+                setEmail('jesus.fuchs909@gmail.com');
+                setPassword('123456789');
+              }}
+              type='button'
+            >
+              Test Credentials - 2
             </Button>
           </CardContent>
           <br />
