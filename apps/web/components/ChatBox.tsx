@@ -2,19 +2,19 @@ import * as React from 'react';
 import { Button } from './ui/button';
 import axios, { AxiosError } from 'axios';
 import { ChartArea, PlusCircle } from 'lucide-react';
-import { Message, User } from '@/lib/types';
+import { Message, PasrsedMessageType, User } from '@/lib/types';
 import { Input } from './ui/input';
 
 import {
   Dialog,
   DialogContent,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { handleNetworkError } from '@/lib/utils';
+import { decode } from 'jsonwebtoken';
 
 export interface IChatBoxProps {
   roomId: string;
@@ -26,6 +26,28 @@ export default function ChatBox(props: IChatBoxProps) {
   const [memebers, setMembers] = React.useState<User[]>([]);
   const [search, setSearch] = React.useState<string>('');
   const [users, setUsers] = React.useState<User[]>([]);
+  const [socket, setSocket] = React.useState<WebSocket | null>(null);
+  const messagesRef = React.useRef<HTMLDivElement>(null);
+  const [userId, setUserId] = React.useState<string>('');
+  const [userName, setUserName] = React.useState<string>('');
+
+  React.useEffect(() => {
+    const token = localStorage.getItem('dexcalidraw-token');
+    if (token) {
+      decode(token, { complete: true });
+      const decoded = decode(token) as { id: string };
+      setUserId(decoded.id);
+    }
+  }, []);
+
+  React.useEffect(() => {
+    if (messagesRef.current && isOpen) {
+      messagesRef.current.scrollBy({
+        top: messagesRef.current.scrollHeight,
+        behavior: 'smooth',
+      });
+    }
+  }, [isOpen, messages]);
 
   React.useEffect(() => {
     async function fetchMessages() {
@@ -52,6 +74,15 @@ export default function ChatBox(props: IChatBoxProps) {
   }, [props.roomId]);
 
   React.useEffect(() => {
+    if (memebers.length > 0 && userId) {
+      const user = memebers.find((m: User) => m.id === userId);
+      if (user) {
+        setUserName(user.name);
+      }
+    }
+  }, [memebers, userId]);
+
+  React.useEffect(() => {
     const timer = setTimeout(async () => {
       if (search) {
         const res = await axios.get(
@@ -71,8 +102,38 @@ export default function ChatBox(props: IChatBoxProps) {
       clearTimeout(timer);
     };
   }, [search]);
-  console.log(users);
-  console.log(memebers);
+
+  React.useEffect(() => {
+    const token = localStorage.getItem('dexcalidraw-token');
+    if (token && isOpen) {
+      const ws = new WebSocket(
+        `${process.env.NEXT_PUBLIC_WS_BACKEND_URL}?token=${token}`
+      );
+      ws.onopen = () => {
+        setSocket(ws);
+      };
+      ws.onmessage = (event) => {
+        const data: PasrsedMessageType = JSON.parse(event.data.toString());
+        console.log(data);
+
+        if (data.type === 'message') {
+          if (data.message) {
+            setMessages((prev) => [...prev, data.message]);
+          }
+        }
+      };
+    }
+    if (!isOpen && socket) {
+      socket.close();
+      setSocket(null);
+    }
+    return () => {
+      if (socket) {
+        socket.close();
+        setSocket(null);
+      }
+    };
+  }, [isOpen]);
 
   const addUser = async (userId: string, name: string) => {
     const token = localStorage.getItem('dexcalidraw-token');
@@ -171,10 +232,15 @@ export default function ChatBox(props: IChatBoxProps) {
                 <Button onClick={() => setIsOpen(false)}>X</Button>
               </div>
             </div>
-            <div className='p-2 overflow-y-auto h-[600px]'>
+            <div ref={messagesRef} className='p-2 overflow-y-auto h-[600px]'>
               {messages.map((message) => (
-                <div key={message.id} className='mb-2'>
-                  <p className='text-sm font-bold'>{message.author.name}</p>
+                <div
+                  key={message.id}
+                  className={`mb-2 p-2 rounded-md ${
+                    message.author.id === userId ? 'text-right' : 'text-left'
+                  } bg-stone-700 text-white shadow-md`}
+                >
+                  <p className='text-sm text-bold'>{message.author.name}</p>
                   <p className='text-sm'>{message.content}</p>
                 </div>
               ))}
@@ -185,15 +251,26 @@ export default function ChatBox(props: IChatBoxProps) {
                 e.preventDefault();
                 const form = e.target as HTMLFormElement;
                 const message = form.message.value;
-                await axios.post(
-                  `${process.env.NEXT_PUBLIC_BACKEND_URL}/rooms/${props.roomId}/messages`,
-                  { content: message },
-                  {
-                    headers: {
-                      Authorization: `Bearer ${localStorage.getItem('dexcalidraw-token')}`,
-                    },
-                  }
-                );
+                const messageId = Math.random().toString();
+                const messageObj: Message = {
+                  id: messageId,
+                  content: message,
+                  createdAt: new Date(),
+                  author: {
+                    id: userId,
+                    name: userName,
+                  },
+                  roomId: props.roomId,
+                };
+                if (socket) {
+                  socket.send(
+                    JSON.stringify({
+                      type: 'message',
+                      message: messageObj,
+                    })
+                  );
+                }
+                setMessages((prev) => [...prev, messageObj]);
                 form.reset();
               }}
             >

@@ -1,0 +1,7 @@
+{
+  "extends": "@dexcalidraw/typescript-config/base",
+  "compilerOptions": {
+    "outDir": "dist",
+    "rootDir": "src"
+  }
+}

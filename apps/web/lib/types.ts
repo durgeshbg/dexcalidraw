@@ -24,6 +24,7 @@ export type Message = {
   content: string;
   createdAt: Date;
   author: User;
+  roomId: string;
 };
 
 export type User = {
@@ -33,3 +34,5 @@ export type User = {
 
 export type SelectedShapeType = 'rectangle' | 'circle';
 export type Shape = Rectagle | Circle;
+
+export type PasrsedMessageType = { type: 'message'; message: Message };
