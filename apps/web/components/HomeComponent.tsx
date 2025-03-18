@@ -6,15 +6,26 @@ import { SelectedShapeType } from '@/lib/types';
 
 export default function HomeComponent({
   selectedShapeType,
+  roomId,
+  socket,
 }: {
   selectedShapeType: SelectedShapeType;
+  roomId: string;
+  socket: WebSocket | null;
 }) {
   const [canvasInstance, setCanvasInstance] = React.useState<CanvasClass>();
 
   if (canvasInstance) {
     canvasInstance.addHandlers();
     canvasInstance.refreshCanvas();
+    canvasInstance.setRoomId(roomId);
   }
+
+  React.useEffect(() => {
+    if (socket) {
+      canvasInstance?.setSocket(socket);
+    }
+  }, [socket]);
 
   React.useEffect(() => {
     if (canvasInstance) {

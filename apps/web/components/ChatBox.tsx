@@ -18,6 +18,7 @@ import { decode } from 'jsonwebtoken';
 
 export interface IChatBoxProps {
   roomId: string;
+  socket: WebSocket | null;
 }
 
 export default function ChatBox(props: IChatBoxProps) {
@@ -26,7 +27,6 @@ export default function ChatBox(props: IChatBoxProps) {
   const [memebers, setMembers] = React.useState<User[]>([]);
   const [search, setSearch] = React.useState<string>('');
   const [users, setUsers] = React.useState<User[]>([]);
-  const [socket, setSocket] = React.useState<WebSocket | null>(null);
   const messagesRef = React.useRef<HTMLDivElement>(null);
   const [userId, setUserId] = React.useState<string>('');
   const [userName, setUserName] = React.useState<string>('');
@@ -104,15 +104,8 @@ export default function ChatBox(props: IChatBoxProps) {
   }, [search]);
 
   React.useEffect(() => {
-    const token = localStorage.getItem('dexcalidraw-token');
-    if (token && isOpen) {
-      const ws = new WebSocket(
-        `${process.env.NEXT_PUBLIC_WS_BACKEND_URL}?token=${token}`
-      );
-      ws.onopen = () => {
-        setSocket(ws);
-      };
-      ws.onmessage = (event) => {
+    if (props.socket && isOpen) {
+      props.socket.onmessage = (event) => {
         const data: PasrsedMessageType = JSON.parse(event.data.toString());
         console.log(data);
 
@@ -123,17 +116,7 @@ export default function ChatBox(props: IChatBoxProps) {
         }
       };
     }
-    if (!isOpen && socket) {
-      socket.close();
-      setSocket(null);
-    }
-    return () => {
-      if (socket) {
-        socket.close();
-        setSocket(null);
-      }
-    };
-  }, [isOpen]);
+  }, [isOpen, props.socket]);
 
   const addUser = async (userId: string, name: string) => {
     const token = localStorage.getItem('dexcalidraw-token');
@@ -262,8 +245,8 @@ export default function ChatBox(props: IChatBoxProps) {
                   },
                   roomId: props.roomId,
                 };
-                if (socket) {
-                  socket.send(
+                if (props.socket) {
+                  props.socket.send(
                     JSON.stringify({
                       type: 'message',
                       message: messageObj,

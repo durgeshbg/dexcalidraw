@@ -8,6 +8,8 @@ export class CanvasClass {
   private y = 0;
   private drawing = false;
   private currentShape: SelectedShapeType = 'circle';
+  private roomId: string | undefined;
+  private socket = new WebSocket(process.env.NEXT_PUBLIC_SOCKET_URL!);
 
   constructor(canvas: HTMLCanvasElement, width: number, height: number) {
     this.canvas = canvas;
@@ -28,6 +30,22 @@ export class CanvasClass {
 
   setShape(shape: SelectedShapeType) {
     this.currentShape = shape;
+  }
+
+  setRoomId(roomId: string) {
+    this.roomId = roomId;
+  }
+
+  setSocket(socket: WebSocket) {
+    this.socket = socket;
+    this.socket.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      if (data.type === 'shape') {
+        const shape: Shape = data.shape;
+        this.Shapes.push(shape);
+        this.refreshCanvas();
+      }
+    };
   }
 
   mouseDownHandler = (e: MouseEvent) => {
@@ -65,22 +83,38 @@ export class CanvasClass {
   mouseUpHandler = (e: MouseEvent) => {
     this.drawing = false;
     if (this.currentShape === 'rectangle') {
-      this.Shapes.push({
+      const rectangle: Shape = {
         type: 'rectangle',
         x: this.x,
         y: this.y,
         width: e.clientX - this.x,
         height: e.clientY - this.y,
-      });
+      };
+      this.Shapes.push(rectangle);
+      this.socket.send(
+        JSON.stringify({
+          type: 'shape',
+          roomId: this.roomId,
+          shape: rectangle,
+        })
+      );
     } else if (this.currentShape === 'circle') {
-      this.Shapes.push({
+      const circle: Shape = {
         type: 'circle',
         x: this.x,
         y: this.y,
         radius: Math.sqrt(
           Math.pow(e.clientX - this.x, 2) + Math.pow(e.clientY - this.y, 2)
         ),
-      });
+      };
+      this.Shapes.push(circle);
+      this.socket.send(
+        JSON.stringify({
+          type: 'shape',
+          roomId: this.roomId,
+          shape: circle,
+        })
+      );
     }
     this.refreshCanvas();
   };
