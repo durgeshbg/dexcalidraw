@@ -19,6 +19,7 @@ export default function HomeComponent({
     canvasInstance.addHandlers();
     canvasInstance.refreshCanvas();
     canvasInstance.setRoomId(roomId);
+    canvasInstance.getShapes();
   }
 
   React.useEffect(() => {

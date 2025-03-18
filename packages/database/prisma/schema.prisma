@@ -39,4 +39,14 @@ model Room {
   users     User[]
   adminId   String
   admin     User      @relation("RoomAdmin", fields: [adminId], references: [id], onDelete: Cascade)
+  shapes    Shape[]
+}
+
+model Shape {
+  id        String   @id @default(uuid())
+  data      Json
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  roomId    String
+  room      Room     @relation(fields: [roomId], references: [id], onDelete: Cascade)
 }

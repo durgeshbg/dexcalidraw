@@ -9,6 +9,7 @@ import {
   removeUserFromRoom,
 } from '../controllers/rooms';
 import { getAllMessages, createMessage } from '../controllers/messages';
+import { getAllShapes, createShape } from '../controllers/shapes';
 
 const router: Router = Router();
 
@@ -23,5 +24,8 @@ router.put('/:roomId/users', removeUserFromRoom);
 // Messages
 router.get('/:roomId/messages', getAllMessages);
 router.post('/:roomId/messages', createMessage);
+// Shapes
+router.get('/:roomId/shapes', getAllShapes);
+router.post('/:roomId/shapes', createShape);
 
 export default router;

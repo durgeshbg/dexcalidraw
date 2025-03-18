@@ -16,7 +16,14 @@ type MessageObj = {
   roomId: string;
 };
 
-type PasrsedMessageType = { type: 'message'; message: MessageObj };
+type ShapeObj = {
+  data: any;
+  roomId: string;
+};
+
+type PasrsedMessageType =
+  | { type: 'message'; message: MessageObj }
+  | { type: 'shape'; shape: ShapeObj };
 
 const app = express();
 app.use(cors());
@@ -78,6 +85,29 @@ wss.on('connection', async function connection(ws: WebSocket, req) {
             })
             .catch((error) => {
               console.error('Error sending message to HTTP backend', error);
+            });
+        } else if (parsedMessage.type === 'shape') {
+          const shape = parsedMessage.shape;
+          axios
+            .post(
+              process.env.HTTP_BACKEND_URL +
+                '/rooms/' +
+                shape.roomId +
+                '/shapes',
+              {
+                data: shape.data,
+              },
+              {
+                headers: {
+                  Authorization: `Bearer ${client[1]}`,
+                },
+              }
+            )
+            .then((response) => {
+              console.log('Shape sent to HTTP backend', response.data);
+            })
+            .catch((error) => {
+              console.error('Error sending shape to HTTP backend', error);
             });
         }
       }

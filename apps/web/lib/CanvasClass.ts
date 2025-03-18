@@ -1,3 +1,4 @@
+import axios from 'axios';
 import { SelectedShapeType, Shape } from './types';
 
 export class CanvasClass {
@@ -36,12 +37,30 @@ export class CanvasClass {
     this.roomId = roomId;
   }
 
+  async getShapes() {
+    const token = localStorage.getItem('dexcalidraw-token');
+    if (token) {
+      const res = await axios.get(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/rooms/${this.roomId}/shapes`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      res.data.shapes.forEach((shape: { data: Shape }) => {
+        this.Shapes.push(shape.data);
+      });
+      this.refreshCanvas();
+    }
+  }
+
   setSocket(socket: WebSocket) {
     this.socket = socket;
     this.socket.onmessage = (event) => {
       const data = JSON.parse(event.data);
       if (data.type === 'shape') {
-        const shape: Shape = data.shape;
+        const { data: shape } = data.shape;
         this.Shapes.push(shape);
         this.refreshCanvas();
       }
@@ -94,8 +113,10 @@ export class CanvasClass {
       this.socket.send(
         JSON.stringify({
           type: 'shape',
-          roomId: this.roomId,
-          shape: rectangle,
+          shape: {
+            roomId: this.roomId,
+            data: rectangle,
+          },
         })
       );
     } else if (this.currentShape === 'circle') {
@@ -111,8 +132,10 @@ export class CanvasClass {
       this.socket.send(
         JSON.stringify({
           type: 'shape',
-          roomId: this.roomId,
-          shape: circle,
+          shape: {
+            roomId: this.roomId,
+            data: circle,
+          },
         })
       );
     }
