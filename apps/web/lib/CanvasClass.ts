@@ -10,7 +10,7 @@ export class CanvasClass {
   private drawing = false;
   private currentShape: SelectedShapeType = 'circle';
   private roomId: string | undefined;
-  private socket = new WebSocket(process.env.NEXT_PUBLIC_SOCKET_URL!);
+  private socket = new WebSocket(process.env.NEXT_PUBLIC_WS_BACKEND_URL!);
 
   constructor(canvas: HTMLCanvasElement, width: number, height: number) {
     this.canvas = canvas;
