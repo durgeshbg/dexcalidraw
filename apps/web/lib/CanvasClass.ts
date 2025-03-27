@@ -10,7 +10,7 @@ export class CanvasClass {
   private drawing = false;
   private currentShape: SelectedShapeType = 'circle';
   private roomId: string | undefined;
-  private socket = new WebSocket(process.env.NEXT_PUBLIC_WS_BACKEND_URL!);
+  private socket: WebSocket | null = null;
 
   constructor(canvas: HTMLCanvasElement, width: number, height: number) {
     this.canvas = canvas;
@@ -110,7 +110,7 @@ export class CanvasClass {
         height: e.clientY - this.y,
       };
       this.Shapes.push(rectangle);
-      this.socket.send(
+      this.socket?.send(
         JSON.stringify({
           type: 'shape',
           shape: {
@@ -129,7 +129,7 @@ export class CanvasClass {
         ),
       };
       this.Shapes.push(circle);
-      this.socket.send(
+      this.socket?.send(
         JSON.stringify({
           type: 'shape',
           shape: {
