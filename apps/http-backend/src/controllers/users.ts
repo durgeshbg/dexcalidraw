@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import { z } from 'zod';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import { prisma } from '@dexcalidraw/database';
+import { prisma } from '@dexcalidraw/database/client';
 import dotenv from 'dotenv';
 dotenv.config();
 

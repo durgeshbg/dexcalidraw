@@ -1,4 +1,4 @@
-import { prisma } from '@dexcalidraw/database';
+import { prisma } from '@dexcalidraw/database/client';
 import { Request, Response } from 'express';
 import z, { any } from 'zod';
 
