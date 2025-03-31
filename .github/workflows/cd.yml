@@ -1,0 +1,29 @@
+name: Deployment to GCP VM
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    name: Deploy to GCP VM
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Script for deployment
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ SECRETS.GCP_PRIVATE_KEY }}" > ~/.ssh/dexcalidraw-key
+          chmod 600 ~/.ssh/dexcalidraw-key
+          ssh-keyscan -H ${{ SECRETS.HOST }} >> ~/.ssh/known_hosts
+          ssh -i ~/.ssh/dexcalidraw-key ${{ SECRETS.USERNAME }}@${{ SECRETS.HOST }} << 'EOF' > output.txt
+          source ~/.nvm/nvm.sh
+          cd ~/dexcalidraw
+          git pull origin main
+          pnpm install
+          pnpm dlx turbo build --filter=http-backend
+          pnpm dlx turbo build --filter=ws-backend
+          pm2 restart all
+          EOF
+          cat output.txt
