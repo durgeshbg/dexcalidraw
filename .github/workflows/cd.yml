@@ -38,6 +38,7 @@ jobs:
           echo "${{ SECRETS.GCP_PRIVATE_KEY }}" > ~/.ssh/dexcalidraw-key
           chmod 600 ~/.ssh/dexcalidraw-key
           ssh-keyscan -H ${{ SECRETS.HOST }} >> ~/.ssh/known_hosts
+          scp -i ~/.ssh/dexcalidraw-key docker-compose.yaml docker-compose.yaml
           ssh -i ~/.ssh/dexcalidraw-key ${{ SECRETS.USERNAME }}@${{ SECRETS.HOST }} << "EOF"
             echo "${{ SECRETS.ENV }}" > .env
             sudo docker compose up -d
