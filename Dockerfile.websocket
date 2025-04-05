@@ -1,0 +1,17 @@
+FROM node:20-alpine
+
+WORKDIR /usr/src/app
+
+RUN npm i -g pnpm
+
+COPY . .
+
+RUN pnpm install
+
+RUN pnpm dlx turbo build --filter=ws-backend
+
+RUN pnpm run db:generate
+
+EXPOSE 8080
+
+CMD ["pnpm", "run", "start:ws"]

@@ -1,0 +1,17 @@
+version: '3.8'
+
+services:
+  dexcalidraw-http:
+    image: durgesh0067/dexcalidraw-http
+    ports:
+      - 3001:3001
+    environment:
+      - JWT_SECRET=${JWT_SECRET}
+      - DATABASE_URL=${DATABASE_URL}
+  dexcalidraw-ws:
+    image: durgesh0067/dexcalidraw-ws
+    ports:
+      - 8080:8080
+    environment:
+      - JWT_SECRET=${JWT_SECRET}
+      - HTTP_BACKEND_URL=${HTTP_BACKEND_URL}

@@ -3,7 +3,10 @@
   "version": "1.0.0",
   "main": "index.js",
   "exports": {
-    "./client": "./src/index.ts"
+    "./client": "./dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc -b"
   },
   "keywords": [],
   "author": "",
@@ -23,6 +26,6 @@
     "@types/node": "^22.13.9"
   },
   "prisma": {
-    "seed": "ts-node prisma/seed.ts"
+    "seed": "pnpm dlx ts-node prisma/seed.ts"
   }
 }
