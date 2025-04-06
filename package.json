@@ -12,7 +12,8 @@
     "start:ws": "cd ./apps/ws-backend && pnpm run start",
     "db:seed": "cd ./packages/database && pnpm dlx prisma db seed",
     "db:migrate": "cd ./packages/database && pnpm dlx prisma migrate dev",
-    "db:generate": "cd ./packages/database && pnpm dlx prisma generate"
+    "db:generate": "cd ./packages/database && pnpm dlx prisma generate",
+    "db:studio": "cd ./packages/database && pnpm dlx prisma studio"
   },
   "devDependencies": {
     "prettier": "^3.5.3",
