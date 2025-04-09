@@ -1,7 +1,14 @@
 import * as React from 'react';
 import { Button } from './ui/button';
 import axios, { AxiosError } from 'axios';
-import { ChartArea, PlusCircle } from 'lucide-react';
+import {
+  CircleMinus,
+  CirclePlus,
+  MessageSquareQuote,
+  Minimize2,
+  SendHorizonal,
+  UserPlus,
+} from 'lucide-react';
 import { Message, PasrsedMessageType, User } from '@/lib/types';
 import { Input } from './ui/input';
 
@@ -22,7 +29,7 @@ export interface IChatBoxProps {
 }
 
 export default function ChatBox(props: IChatBoxProps) {
-  const [isOpen, setIsOpen] = React.useState(false);
+  const [isOpen, setIsOpen] = React.useState(true);
   const [messages, setMessages] = React.useState<Message[]>([]);
   const [memebers, setMembers] = React.useState<User[]>([]);
   const [search, setSearch] = React.useState<string>('');
@@ -178,23 +185,26 @@ export default function ChatBox(props: IChatBoxProps) {
               />
             </div>
           </div>
-          <ul className='flex flex-col gap-2 items-center justify-center'>
+          <ul className='flex flex-wrap gap-2 items-center justify-center'>
             {users.map((user: User) => (
-              <li className='flex gap-2' key={user.id}>
+              <li
+                className='flex items-center gap-2 border-2 px-2 py-1 rounded-sm'
+                key={user.id}
+              >
                 {user.name}{' '}
                 {memebers.filter((m) => m.id === user.id).length > 0 ? (
                   <Button
                     onClick={() => removeUser(user.id)}
                     className='bg-stone-700'
                   >
-                    Remove
+                    <CircleMinus />
                   </Button>
                 ) : (
                   <Button
                     onClick={() => addUser(user.id, user.name)}
                     className='bg-stone-700'
                   >
-                    Add
+                    <CirclePlus />
                   </Button>
                 )}
               </li>
@@ -209,10 +219,12 @@ export default function ChatBox(props: IChatBoxProps) {
               <div className='flex gap-2'>
                 <DialogTrigger asChild>
                   <Button variant='outline'>
-                    Add <PlusCircle />
+                    <UserPlus />
                   </Button>
                 </DialogTrigger>
-                <Button onClick={() => setIsOpen(false)}>X</Button>
+                <Button onClick={() => setIsOpen(false)}>
+                  <Minimize2 />
+                </Button>
               </div>
             </div>
             <div ref={messagesRef} className='p-2 overflow-y-auto h-[600px]'>
@@ -263,12 +275,14 @@ export default function ChatBox(props: IChatBoxProps) {
                 className='w-full p-2 rounded-md bg-stone-700 text-white'
                 placeholder='Type a message...'
               />
-              <Button>Send</Button>
+              <Button>
+                <SendHorizonal />
+              </Button>
             </form>
           </div>
         ) : (
           <Button onClick={() => setIsOpen(true)}>
-            <ChartArea />
+            <MessageSquareQuote />
           </Button>
         )}
       </Dialog>

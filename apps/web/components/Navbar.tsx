@@ -2,7 +2,7 @@ import * as React from 'react';
 import { Button } from './ui/button';
 import { redirect } from 'next/navigation';
 import { Mode, MODES, SelectedShapeType, SHAPE_TYPES } from '@/lib/types';
-import { Square, Circle, Hand, PencilIcon } from 'lucide-react';
+import { Square, Circle, Hand, PencilIcon, RotateCcw } from 'lucide-react';
 export interface INavbarProps {
   setSelectedShapeType?: React.Dispatch<
     React.SetStateAction<SelectedShapeType>
@@ -10,6 +10,7 @@ export interface INavbarProps {
   setMode?: React.Dispatch<React.SetStateAction<Mode>>;
   mode?: Mode;
   selectedShapeType?: SelectedShapeType;
+  resetScale: () => void;
 }
 
 export default function Navbar({
@@ -17,6 +18,7 @@ export default function Navbar({
   setSelectedShapeType,
   mode,
   setMode,
+  resetScale,
 }: INavbarProps) {
   const shapesMapping = [
     { shape: SHAPE_TYPES[0], icon: <Square /> },
@@ -56,6 +58,9 @@ export default function Navbar({
               {m.icon}
             </Button>
           ))}
+          <Button onClick={resetScale}>
+            Scale <RotateCcw />
+          </Button>
         </div>
       )}
       <div className='flex space-x-4'>

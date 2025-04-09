@@ -10,7 +10,7 @@ export function cn(...inputs: ClassValue[]) {
 
 export function handleNetworkError(e: AxiosError) {
   const { response } = e as AxiosError;
-
+  const { request } = e as AxiosError;
   if (response?.data) {
     const { data } = response as AxiosResponse;
 
@@ -25,6 +25,11 @@ export function handleNetworkError(e: AxiosError) {
     } else {
       toast.error(data.message);
     }
+  }
+  if (request) {
+    const { response, statusText } = request as XMLHttpRequest;
+    const responseParsed = JSON.parse(response as string);
+    toast.error(`${statusText} - ${responseParsed.error}`);
   }
   console.error(e);
 }

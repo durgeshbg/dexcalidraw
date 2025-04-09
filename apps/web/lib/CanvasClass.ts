@@ -23,7 +23,8 @@ export class CanvasClass {
   }
 
   resetScale() {
-    this.viewPorts.scale = 1;
+    this.viewPorts = { x: 0, y: 0, scale: 1 };
+    this.refreshCanvas();
   }
   setShape(shape: SelectedShapeType) {
     this.currentShape = shape;
@@ -150,7 +151,8 @@ export class CanvasClass {
 
   mouseScrollHandler = (e: WheelEvent) => {
     const previousScale = this.viewPorts.scale;
-    const newScale = (this.viewPorts.scale += e.deltaY * -0.01);
+    let newScale = previousScale + e.deltaY * -0.001;
+    newScale = Math.max(0.09, newScale);
 
     const newX =
       e.clientX - (e.clientX - this.viewPorts.x) * (newScale / previousScale);
