@@ -54,7 +54,7 @@ export default function Home() {
   return (
     <>
       <RedirectIfNotAuth />
-      <Navbar setSelectedShapeType={null} />
+      <Navbar />
       <div>
         <h1 className='text-4xl text-center mt-20'>Rooms</h1>
         <div className='flex flex-col'>

@@ -32,7 +32,13 @@ export type User = {
   id: string;
 };
 
-export type SelectedShapeType = 'rectangle' | 'circle';
+export const SHAPE_TYPES = ['rectangle', 'circle'] as const;
+export type SelectedShapeType = (typeof SHAPE_TYPES)[number];
+
+export const MODES = ['drawing', 'pan'] as const;
+export type Mode = (typeof MODES)[number];
+
+export type ViewPort = { x: number; y: number; scale: number };
 export type Shape = Rectagle | Circle;
 
 export type PasrsedMessageType = { type: 'message'; message: Message };

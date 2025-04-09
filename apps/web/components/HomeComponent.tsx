@@ -2,16 +2,18 @@
 import * as React from 'react';
 import Canvas from './Canvas';
 import { CanvasClass } from '@/lib/CanvasClass';
-import { SelectedShapeType } from '@/lib/types';
+import { Mode, SelectedShapeType } from '@/lib/types';
 
 export default function HomeComponent({
   selectedShapeType,
   roomId,
   socket,
+  mode,
 }: {
   selectedShapeType: SelectedShapeType;
   roomId: string;
   socket: WebSocket | null;
+  mode: Mode;
 }) {
   const [canvasInstance, setCanvasInstance] = React.useState<CanvasClass>();
 
@@ -26,17 +28,18 @@ export default function HomeComponent({
     if (socket) {
       canvasInstance?.setSocket(socket);
     }
-  }, [socket]);
+  }, [socket, canvasInstance]);
 
   React.useEffect(() => {
     if (canvasInstance) {
       canvasInstance.setShape(selectedShapeType);
+      canvasInstance?.setMode(mode);
     }
-  }, [selectedShapeType, canvasInstance]);
+  }, [selectedShapeType, canvasInstance, mode]);
 
   return (
     <div>
-      <Canvas setCanvasInstance={setCanvasInstance} />
+      <Canvas mode={mode} setCanvasInstance={setCanvasInstance} />
     </div>
   );
 }

@@ -2,7 +2,7 @@
 import ChatBox from '@/components/ChatBox';
 import HomeComponent from '@/components/HomeComponent';
 import Navbar from '@/components/Navbar';
-import { SelectedShapeType } from '@/lib/types';
+import { Mode, SelectedShapeType } from '@/lib/types';
 import { useParams } from 'next/navigation';
 import * as React from 'react';
 
@@ -13,6 +13,7 @@ export default function Room() {
 
   const [selectedShapeType, setSelectedShapeType] =
     React.useState<SelectedShapeType>('rectangle');
+  const [mode, setMode] = React.useState<Mode>('drawing');
 
   React.useEffect(() => {
     const token = localStorage.getItem('dexcalidraw-token');
@@ -34,8 +35,18 @@ export default function Room() {
 
   return (
     <div className='flex flex-col items-center justify-center min-h-screen bg-stone-900'>
-      <Navbar setSelectedShapeType={setSelectedShapeType} />
-      <HomeComponent roomId={roomId} socket={socket} selectedShapeType={selectedShapeType} />
+      <Navbar
+        selectedShapeType={selectedShapeType}
+        setSelectedShapeType={setSelectedShapeType}
+        mode={mode}
+        setMode={setMode}
+      />
+      <HomeComponent
+        roomId={roomId}
+        socket={socket}
+        selectedShapeType={selectedShapeType}
+        mode={mode}
+      />
       <ChatBox socket={socket} roomId={roomId} />
     </div>
   );
