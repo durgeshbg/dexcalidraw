@@ -41,9 +41,9 @@ jobs:
           scp -i ~/.ssh/dexcalidraw-key docker-compose.yml ${{ SECRETS.USERNAME }}@${{ SECRETS.HOST }}:~/docker-compose.yml
           ssh -i ~/.ssh/dexcalidraw-key ${{ SECRETS.USERNAME }}@${{ SECRETS.HOST }} << "EOF"
             echo "${{ SECRETS.ENV }}" > .env
-            sudo docker compose pull
             sudo docker compose down
             sudo docker container prune -f
             sudo docker image prune -af
+            sudo docker compose pull
             sudo docker compose up -d
           EOF
