@@ -10,7 +10,7 @@ export interface INavbarProps {
   setMode?: React.Dispatch<React.SetStateAction<Mode>>;
   mode?: Mode;
   selectedShapeType?: SelectedShapeType;
-  resetScale: () => void;
+  resetScale?: () => void;
 }
 
 export default function Navbar({
