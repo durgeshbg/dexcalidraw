@@ -1,4 +1,5 @@
 'use client';
+
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -46,78 +47,86 @@ export default function SignIn() {
   };
 
   return (
-    <div>
-      <div className='flex justify-center align-center gap-5 mt-10'>
-        <h1 className='text-5xl'>Decalidraw</h1>
-        <div className='flex flex-col justify-center align-center'>
-          <p className='text-sm'>Your</p>
-          <p className='text-sm'>collbrative</p>
-          <p className='text-sm'>thinking</p>
-          <p className='text-sm'>platform</p>
+    <div className="min-h-screen flex flex-col items-center justify-center px-4 py-8">
+      <div className="flex items-center gap-4 mb-12">
+        <h1 className="text-5xl font-bold text-white">Decalidraw</h1>
+        <div className="flex flex-col leading-tight text-white text-sm">
+          <p>Your</p>
+          <p>collaborative</p>
+          <p>thinking</p>
+          <p>platform</p>
         </div>
       </div>
-      <h3 className='text-3xl text-center mt-32'>Sign In</h3>
-      <form onSubmit={handleSubmit}>
-        <Card className='w-[450px] mx-auto mt-10 shadow-lg'>
+
+      <Card className="w-full max-w-md shadow-2xl border border-gray-800 bg-background">
+        <form onSubmit={handleSubmit}>
           <CardHeader>
-            <CardTitle>Sign In</CardTitle>
-            <CardDescription>Please enter your credentials</CardDescription>
+            <CardTitle className="text-2xl">Sign In</CardTitle>
+            <CardDescription className="text-muted-foreground">
+              Please enter your credentials to continue
+            </CardDescription>
           </CardHeader>
-          <CardContent>
-            <Label>
-              Email:
+          <CardContent className="space-y-4">
+            <div>
+              <Label htmlFor="email">Email</Label>
               <Input
+                id="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                type='email'
-                name='email'
+                type="email"
+                required
               />
-            </Label>
-            <br />
-            <Label>
-              Password:
+            </div>
+            <div>
+              <Label htmlFor="password">Password</Label>
               <Input
+                id="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                type='password'
-                name='password'
+                type="password"
+                required
               />
-            </Label>
+            </div>
           </CardContent>
-          <CardContent>
-            <Button type='submit'>Submit</Button>
-          </CardContent>
-          <CardContent className='flex gap-5'>
+
+          <CardContent className="flex flex-col sm:flex-row gap-3">
             <Button
+              type="button"
               onClick={() => {
                 setEmail('samran.vos@gmail.com');
                 setPassword('123456789');
               }}
-              type='button'
+              variant="outline"
+              className="w-full"
             >
-              Test Credentials - 1
+              Test Credentials 1
             </Button>
             <Button
+              type="button"
               onClick={() => {
                 setEmail('jesus.fuchs909@gmail.com');
                 setPassword('123456789');
               }}
-              type='button'
+              variant="outline"
+              className="w-full"
             >
-              Test Credentials - 2
+              Test Credentials 2
             </Button>
           </CardContent>
-          <br />
-          <CardFooter>
-            <p className='text-gray-500'>
+
+          <CardFooter className="flex flex-col gap-3 items-start">
+            <Button type="submit" className="w-full">
+              Sign In
+            </Button>
+            <p className="text-sm text-muted-foreground">
               Don&apos;t have an account?{' '}
-              <Link className='font-bold underline' href='/signup'>
+              <Link className="underline text-primary" href="/signup">
                 Sign Up
               </Link>
             </p>
           </CardFooter>
-        </Card>
-      </form>
+        </form>
+      </Card>
     </div>
   );
 }

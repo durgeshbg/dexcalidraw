@@ -1,4 +1,5 @@
 'use client';
+
 import ChatBox from '@/components/ChatBox';
 import HomeComponent from '@/components/HomeComponent';
 import Navbar from '@/components/Navbar';
@@ -46,6 +47,7 @@ export default function Room() {
         setSocket(null);
       }
     };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   React.useEffect(() => {
@@ -62,7 +64,7 @@ export default function Room() {
   }, [selectedShapeType, canvasInstance, mode]);
 
   return (
-    <div className='flex flex-col items-center justify-center min-h-screen bg-stone-900'>
+    <div className='flex flex-col items-center justify-start min-h-screen bg-stone-900'>
       <Navbar
         selectedShapeType={selectedShapeType}
         setSelectedShapeType={setSelectedShapeType}
@@ -70,8 +72,12 @@ export default function Room() {
         setMode={setMode}
         resetScale={resetScale}
       />
+
       <HomeComponent setCanvasInstance={setCanvasInstance} mode={mode} />
-      <ChatBox socket={socket} roomId={roomId} />
+
+      <div className='w-full max-w-xs bg-gray-800 rounded-lg shadow-lg'>
+        <ChatBox socket={socket} roomId={roomId} />
+      </div>
     </div>
   );
 }

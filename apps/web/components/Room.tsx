@@ -13,7 +13,9 @@ export interface IRoomProps {
 }
 
 export default function Room(props: IRoomProps) {
-  const handleDelete = async () => {
+  const handleDelete = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+
     const token = localStorage.getItem('dexcalidraw-token');
     if (token) {
       const res = await axios.delete(
@@ -34,18 +36,27 @@ export default function Room(props: IRoomProps) {
       toast.success('Room deleted successfully');
     }
   };
+
   return (
-    <div className='flex flex-col items-center justify-center gap-3 overflow-x-auto'>
+    <div className='flex flex-col items-center justify-center gap-3'>
       <Card
         onClick={() => redirect(`/rooms/${props.room.id}`)}
-        className='w-52 h-52 flex items-center justify-center bg-stone-900 text-white text-xl hover:bg-stone-800 cursor-pointer rounded-full flex-col'
+        className='w-48 h-48 flex flex-col items-center justify-center bg-gradient-to-br from-blue-500 to-indigo-500 text-white text-xl rounded-lg hover:scale-105 transition-transform duration-200 ease-in-out shadow-md cursor-pointer relative'
       >
-        <CardTitle className='text-7xl mt-8'>{props.room.name[0]}</CardTitle>
-        <CardFooter className='text-sm'>{props.room.name}</CardFooter>
+        <CardTitle className='text-6xl font-bold mt-4'>
+          {props.room.name[0]}
+        </CardTitle>
+        <CardFooter className='text-sm text-center'>
+          {props.room.name}
+        </CardFooter>
+
+        <Button
+          onClick={handleDelete}
+          className='absolute top-2 right-2 bg-red-500 hover:bg-red-600 text-white w-8 h-8 flex items-center justify-center rounded-full shadow-md transition-all duration-200 ease-in-out'
+        >
+          <DeleteIcon className='w-4 h-4' />
+        </Button>
       </Card>
-      <Button onClick={handleDelete} className='bg-red-500 hover:bg-red-600'>
-        <DeleteIcon className='size-5 text-white' />
-      </Button>
     </div>
   );
 }

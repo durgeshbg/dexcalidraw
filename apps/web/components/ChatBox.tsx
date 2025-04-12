@@ -1,27 +1,20 @@
 import * as React from 'react';
 import { Button } from './ui/button';
-import axios, { AxiosError } from 'axios';
-import {
-  CircleMinus,
-  CirclePlus,
-  MessageSquareQuote,
-  Minimize2,
-  SendHorizonal,
-  UserPlus,
-} from 'lucide-react';
+import { AxiosError } from 'axios';
+import { MessageSquareQuote } from 'lucide-react';
 import { Message, PasrsedMessageType, User } from '@/lib/types';
-import { Input } from './ui/input';
 
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@/components/ui/dialog';
-import { Label } from '@/components/ui/label';
+import { Dialog } from '@/components/ui/dialog';
 import { handleNetworkError } from '@/lib/utils';
 import { decode } from 'jsonwebtoken';
+import {
+  addUserReq,
+  fetchMessages,
+  removeUserReq,
+  searchUsers,
+} from '@/utils/messageServices';
+import ChatWidget from './ChatWidget';
+import MembersForm from './MembersForm';
 
 export interface IChatBoxProps {
   roomId: string;
@@ -57,27 +50,11 @@ export default function ChatBox(props: IChatBoxProps) {
   }, [isOpen, messages]);
 
   React.useEffect(() => {
-    async function fetchMessages() {
-      const res = await axios.get(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/rooms/${props.roomId}/messages`,
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem('dexcalidraw-token')}`,
-          },
-        }
-      );
-      setMessages(res.data.messages);
-      const res2 = await axios.get(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/rooms/${props.roomId}/`,
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem('dexcalidraw-token')}`,
-          },
-        }
-      );
-      setMembers(res2.data.room.users);
-    }
-    fetchMessages();
+    (async () => {
+      const { messages, members } = await fetchMessages(props.roomId);
+      setMessages(messages);
+      setMembers(members);
+    })();
   }, [props.roomId]);
 
   React.useEffect(() => {
@@ -92,15 +69,8 @@ export default function ChatBox(props: IChatBoxProps) {
   React.useEffect(() => {
     const timer = setTimeout(async () => {
       if (search) {
-        const res = await axios.get(
-          `${process.env.NEXT_PUBLIC_BACKEND_URL}/users?s=${search}`,
-          {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem('dexcalidraw-token')}`,
-            },
-          }
-        );
-        setUsers(res.data.users);
+        const users = await searchUsers(search);
+        setUsers(users);
       } else {
         setUsers([]);
       }
@@ -114,8 +84,6 @@ export default function ChatBox(props: IChatBoxProps) {
     if (props.socket && isOpen) {
       props.socket.onmessage = (event) => {
         const data: PasrsedMessageType = JSON.parse(event.data.toString());
-        console.log(data);
-
         if (data.type === 'message') {
           if (data.message) {
             setMessages((prev) => [...prev, data.message]);
@@ -129,15 +97,7 @@ export default function ChatBox(props: IChatBoxProps) {
     const token = localStorage.getItem('dexcalidraw-token');
     if (token) {
       try {
-        await axios.post(
-          `${process.env.NEXT_PUBLIC_BACKEND_URL}/rooms/${props.roomId}/users`,
-          { userId },
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
+        await addUserReq(userId, props.roomId, token);
         setMembers((prev) => [...prev, { id: userId, name }]);
       } catch (error) {
         handleNetworkError(error as AxiosError);
@@ -148,15 +108,7 @@ export default function ChatBox(props: IChatBoxProps) {
     const token = localStorage.getItem('dexcalidraw-token');
     if (token) {
       try {
-        await axios.put(
-          `${process.env.NEXT_PUBLIC_BACKEND_URL}/rooms/${props.roomId}/users`,
-          { userId },
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
+        await removeUserReq(userId, props.roomId, token);
         setMembers((prev) => prev.filter((user) => user.id !== userId));
       } catch (error) {
         handleNetworkError(error as AxiosError);
@@ -164,124 +116,58 @@ export default function ChatBox(props: IChatBoxProps) {
     }
   };
 
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const form = e.target as HTMLFormElement;
+    const message = form.message.value;
+    const messageId = Math.random().toString();
+    const messageObj: Message = {
+      id: messageId,
+      content: message,
+      createdAt: new Date(),
+      author: {
+        id: userId,
+        name: userName,
+      },
+      roomId: props.roomId,
+    };
+    if (props.socket) {
+      props.socket.send(
+        JSON.stringify({
+          type: 'message',
+          message: messageObj,
+        })
+      );
+    }
+    setMessages((prev) => [...prev, messageObj]);
+    form.reset();
+  };
+
   return (
     <div className='fixed bottom-4 right-2'>
       <Dialog>
-        <DialogContent className='sm:max-w-[425px]'>
-          <DialogHeader>
-            <DialogTitle>Add Members</DialogTitle>
-          </DialogHeader>
-          <div className='grid gap-4 py-4'>
-            <div className='grid grid-cols-4 items-center gap-4'>
-              <Label htmlFor='name' className='text-right'>
-                Search
-              </Label>
-              <Input
-                id='search'
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                className='col-span-3'
-                placeholder='John'
-              />
-            </div>
-          </div>
-          <ul className='flex flex-wrap gap-2 items-center justify-center'>
-            {users.map((user: User) => (
-              <li
-                className='flex items-center gap-2 border-2 px-2 py-1 rounded-sm'
-                key={user.id}
-              >
-                {user.name}{' '}
-                {memebers.filter((m) => m.id === user.id).length > 0 ? (
-                  <Button
-                    onClick={() => removeUser(user.id)}
-                    className='bg-stone-700'
-                  >
-                    <CircleMinus />
-                  </Button>
-                ) : (
-                  <Button
-                    onClick={() => addUser(user.id, user.name)}
-                    className='bg-stone-700'
-                  >
-                    <CirclePlus />
-                  </Button>
-                )}
-              </li>
-            ))}
-          </ul>
-        </DialogContent>
+        <MembersForm
+          memebers={memebers}
+          users={users}
+          search={search}
+          setSearch={setSearch}
+          removeUser={removeUser}
+          addUser={addUser}
+        />
 
         {isOpen ? (
-          <div className='w-96 min-h-[700px] bg-stone-800 rounded-md shadow-md p-2'>
-            <div className='flex justify-between items-center p-2 border-b-2 border-stone-700'>
-              <h1 className='text-lg font-bold'>Chat</h1>
-              <div className='flex gap-2'>
-                <DialogTrigger asChild>
-                  <Button variant='outline'>
-                    <UserPlus />
-                  </Button>
-                </DialogTrigger>
-                <Button onClick={() => setIsOpen(false)}>
-                  <Minimize2 />
-                </Button>
-              </div>
-            </div>
-            <div ref={messagesRef} className='p-2 overflow-y-auto h-[600px]'>
-              {messages.map((message) => (
-                <div
-                  key={message.id}
-                  className={`mb-2 p-2 rounded-md ${
-                    message.author.id === userId ? 'text-right' : 'text-left'
-                  } bg-stone-700 text-white shadow-md`}
-                >
-                  <p className='text-sm text-bold'>{message.author.name}</p>
-                  <p className='text-sm'>{message.content}</p>
-                </div>
-              ))}
-            </div>
-            <form
-              className='flex gap-2 p-2'
-              onSubmit={async (e) => {
-                e.preventDefault();
-                const form = e.target as HTMLFormElement;
-                const message = form.message.value;
-                const messageId = Math.random().toString();
-                const messageObj: Message = {
-                  id: messageId,
-                  content: message,
-                  createdAt: new Date(),
-                  author: {
-                    id: userId,
-                    name: userName,
-                  },
-                  roomId: props.roomId,
-                };
-                if (props.socket) {
-                  props.socket.send(
-                    JSON.stringify({
-                      type: 'message',
-                      message: messageObj,
-                    })
-                  );
-                }
-                setMessages((prev) => [...prev, messageObj]);
-                form.reset();
-              }}
-            >
-              <Input
-                type='text'
-                name='message'
-                className='w-full p-2 rounded-md bg-stone-700 text-white'
-                placeholder='Type a message...'
-              />
-              <Button>
-                <SendHorizonal />
-              </Button>
-            </form>
-          </div>
+          <ChatWidget
+            userId={userId}
+            handleSubmit={handleSubmit}
+            setIsOpen={setIsOpen}
+            messages={messages}
+            messagesRef={messagesRef}
+          />
         ) : (
-          <Button onClick={() => setIsOpen(true)}>
+          <Button
+            onClick={() => setIsOpen(true)}
+            className='bg-indigo-600 text-white hover:bg-indigo-500 rounded-full p-3 shadow-lg'
+          >
             <MessageSquareQuote />
           </Button>
         )}

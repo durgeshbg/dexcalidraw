@@ -94,7 +94,6 @@ export const getUserInfo = async (req: Request, res: Response) => {
 
 export const getUsers = async (req: Request, res: Response) => {
   const s = req?.query?.s as string;
-
   if (s) {
     const users = await prisma.user.findMany({
       where: {
