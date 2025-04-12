@@ -25,7 +25,7 @@ export default function ChatBox(props: IChatBoxProps) {
   const [isOpen, setIsOpen] = React.useState(true);
   const [messages, setMessages] = React.useState<Message[]>([]);
   const [memebers, setMembers] = React.useState<User[]>([]);
-  const [search, setSearch] = React.useState<string>('');
+  const [search, setSearch] = React.useState<string>('a');
   const [users, setUsers] = React.useState<User[]>([]);
   const messagesRef = React.useRef<HTMLDivElement>(null);
   const [userId, setUserId] = React.useState<string>('');

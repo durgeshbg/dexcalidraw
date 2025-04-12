@@ -4,7 +4,7 @@ import { Label } from './ui/label';
 import { Input } from './ui/input';
 import { User } from '@/lib/types';
 import { Button } from './ui/button';
-import { CircleMinus, CirclePlus } from 'lucide-react';
+import { Plus, Minus } from 'lucide-react';
 
 export interface IMembersFormProps {
   memebers: User[];
@@ -24,49 +24,76 @@ export default function MembersForm({
   addUser,
 }: IMembersFormProps) {
   return (
-    <DialogContent className='sm:max-w-[425px]'>
+    <DialogContent className='sm:max-w-[500px] bg-gray-900 text-white border border-gray-800 rounded-2xl shadow-xl'>
       <DialogHeader>
-        <DialogTitle className='text-gray-100'>Add Members</DialogTitle>
+        <DialogTitle className='text-lg font-semibold text-white'>
+          Manage Members
+        </DialogTitle>
       </DialogHeader>
-      <div className='grid gap-4 py-4'>
+
+      <div className='grid gap-4 py-2'>
         <div className='grid grid-cols-4 items-center gap-4'>
-          <Label htmlFor='name' className='text-right text-gray-200'>
+          <Label htmlFor='search' className='text-right text-gray-300 text-sm'>
             Search
           </Label>
           <Input
             id='search'
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className='col-span-3 bg-gray-700 text-white placeholder-gray-400 focus:ring-2 focus:ring-indigo-500'
-            placeholder='John'
+            className='col-span-3 bg-gray-800 text-white placeholder-gray-500 border border-gray-700 focus:ring-indigo-500 focus:border-indigo-500 text-sm rounded-md'
+            placeholder='Search users...'
           />
         </div>
       </div>
-      <ul className='flex flex-wrap gap-2 items-center justify-center'>
-        {users.map((user: User) => (
-          <li
-            className='flex items-center gap-2 border-2 border-gray-600 px-2 py-1 rounded-sm bg-gray-800'
-            key={user.id}
-          >
-            {user.name}{' '}
-            {memebers.filter((m) => m.id === user.id).length > 0 ? (
-              <Button
-                onClick={() => removeUser(user.id)}
-                className='bg-gray-700 text-gray-300 hover:bg-gray-600'
+
+      <div className='mt-4 max-h-64 overflow-y-auto space-y-2 pr-1'>
+        {users.length === 0 ? (
+          <p className='text-gray-500 text-center text-sm'>No users found.</p>
+        ) : (
+          users.map((user: User) => {
+            const isMember = memebers.some((m) => m.id === user.id);
+            const initials = user.name
+              .split(' ')
+              .map((word) => word[0]?.toUpperCase())
+              .slice(0, 2)
+              .join('');
+
+            return (
+              <div
+                key={user.id}
+                className='flex items-center justify-between px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg hover:bg-gray-700 transition-colors duration-150'
               >
-                <CircleMinus />
-              </Button>
-            ) : (
-              <Button
-                onClick={() => addUser(user.id, user.name)}
-                className='bg-gray-700 text-gray-300 hover:bg-gray-600'
-              >
-                <CirclePlus />
-              </Button>
-            )}
-          </li>
-        ))}
-      </ul>
+                <div className='flex items-center gap-3'>
+                  <div className='w-8 h-8 bg-indigo-600 text-white text-xs font-bold flex items-center justify-center rounded-full shadow-sm'>
+                    {initials}
+                  </div>
+                  <span className='text-sm font-medium text-gray-100 truncate'>
+                    {user.name}
+                  </span>
+                </div>
+                <Button
+                  onClick={() =>
+                    isMember ? removeUser(user.id) : addUser(user.id, user.name)
+                  }
+                  size='icon'
+                  variant='ghost'
+                  className={`transition-colors duration-200 ${
+                    isMember
+                      ? 'text-rose-500 hover:text-rose-400'
+                      : 'text-gray-400 hover:text-indigo-400'
+                  }`}
+                >
+                  {isMember ? (
+                    <Minus className='w-4 h-4' />
+                  ) : (
+                    <Plus className='w-4 h-4' />
+                  )}
+                </Button>
+              </div>
+            );
+          })
+        )}
+      </div>
     </DialogContent>
   );
 }

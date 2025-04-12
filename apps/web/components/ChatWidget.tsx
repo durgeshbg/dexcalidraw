@@ -13,6 +13,12 @@ export interface IChatWidgetProps {
   messagesRef: React.RefObject<HTMLDivElement | null>;
 }
 
+function getInitials(name: string) {
+  const names = name.split(' ');
+  const initials = names.map(n => n.charAt(0).toUpperCase()).join('');
+  return initials.slice(0, 2);
+}
+
 export default function ChatWidget({
   userId,
   setIsOpen,
@@ -39,17 +45,32 @@ export default function ChatWidget({
         </div>
       </div>
       <div ref={messagesRef} className='p-2 overflow-y-auto h-[600px]'>
-        {messages.map((message) => (
-          <div
-            key={message.id}
-            className={`mb-2 p-2 rounded-md ${
-              message.author.id === userId ? 'text-right' : 'text-left'
-            } bg-gray-700 text-white shadow-md`}
-          >
-            <p className='text-sm font-semibold'>{message.author.name}</p>
-            <p className='text-sm'>{message.content}</p>
-          </div>
-        ))}
+        {messages.map((message) => {
+          const isUser = message.author.id === userId;
+          const initials = getInitials(message.author.name);
+          return (
+            <div
+              key={message.id}
+              className={`mb-2 p-2 rounded-md flex items-start gap-2 ${
+                isUser ? 'justify-end text-right' : 'justify-start text-left'
+              }`}
+            >
+              {!isUser && (
+                <div className='w-8 h-8 flex items-center justify-center rounded-full bg-indigo-600 text-white text-sm font-bold'>
+                  {initials}
+                </div>
+              )}
+              <div className='bg-gray-700 text-white shadow-md p-2 rounded-md max-w-[80%]'>
+                <p className='text-sm'>{message.content}</p>
+              </div>
+              {isUser && (
+                <div className='w-8 h-8 flex items-center justify-center rounded-full bg-gray-600 text-white text-sm font-bold'>
+                  {initials}
+                </div>
+              )}
+            </div>
+          );
+        })}
       </div>
       <form className='flex gap-2 p-2' onSubmit={handleSubmit}>
         <Input
