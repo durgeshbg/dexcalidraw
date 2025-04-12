@@ -94,6 +94,17 @@ export class CanvasClass {
           2 * Math.PI
         );
         this.ctx!.stroke();
+      } else if (this.currentShape === 'line') {
+        this.ctx!.beginPath();
+        this.ctx!.moveTo(
+          (this.x - this.viewPorts.x) / this.viewPorts.scale,
+          (this.y - this.viewPorts.y) / this.viewPorts.scale
+        );
+        this.ctx!.lineTo(
+          (e.clientX - this.viewPorts.x) / this.viewPorts.scale,
+          (e.clientY - this.viewPorts.y) / this.viewPorts.scale
+        );
+        this.ctx!.stroke();
       }
     } else if (this.mouseDown && this.mode === 'pan') {
       this.viewPorts.x += e.clientX - this.x;
@@ -144,6 +155,24 @@ export class CanvasClass {
             },
           })
         );
+      } else if (this.currentShape === 'line') {
+        const line: Shape = {
+          type: 'line',
+          x: (this.x - this.viewPorts.x) / this.viewPorts.scale,
+          y: (this.y - this.viewPorts.y) / this.viewPorts.scale,
+          x2: (e.clientX - this.viewPorts.x) / this.viewPorts.scale,
+          y2: (e.clientY - this.viewPorts.y) / this.viewPorts.scale,
+        };
+        this.Shapes.push(line);
+        this.socket?.send(
+          JSON.stringify({
+            type: 'shape',
+            shape: {
+              roomId: this.roomId,
+              data: line,
+            },
+          })
+        );
       }
     }
     this.refreshCanvas();
@@ -184,6 +213,12 @@ export class CanvasClass {
       if (shape.type === 'circle') {
         this.ctx!.beginPath();
         this.ctx!.arc(shape.x, shape.y, shape.radius, 0, 2 * Math.PI);
+        this.ctx!.stroke();
+      }
+      if (shape.type === 'line') {
+        this.ctx!.beginPath();
+        this.ctx!.moveTo(shape.x, shape.y);
+        this.ctx!.lineTo(shape.x2, shape.y2);
         this.ctx!.stroke();
       }
     });

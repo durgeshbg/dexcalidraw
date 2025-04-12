@@ -8,6 +8,7 @@ import {
   Hand,
   RotateCcw,
   MousePointer2Icon,
+  ChevronsLeftRightEllipsis,
 } from 'lucide-react';
 
 export interface INavbarProps {
@@ -30,6 +31,7 @@ export default function Navbar({
   const shapesMapping = [
     { shape: SHAPE_TYPES[0], icon: <Square size={20} /> },
     { shape: SHAPE_TYPES[1], icon: <Circle size={20} /> },
+    { shape: SHAPE_TYPES[2], icon: <ChevronsLeftRightEllipsis size={20} /> },
   ];
 
   const modesMapping = [

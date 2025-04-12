@@ -13,6 +13,14 @@ export type Circle = {
   radius: number;
 };
 
+export type Line = {
+  type: 'line';
+  x: number;
+  y: number;
+  x2: number;
+  y2: number;
+};
+
 export type Room = {
   id: string;
   name: string;
@@ -32,13 +40,13 @@ export type User = {
   id: string;
 };
 
-export const SHAPE_TYPES = ['rectangle', 'circle'] as const;
+export const SHAPE_TYPES = ['rectangle', 'circle', 'line'] as const;
 export type SelectedShapeType = (typeof SHAPE_TYPES)[number];
 
 export const MODES = ['drawing', 'pan'] as const;
 export type Mode = (typeof MODES)[number];
 
 export type ViewPort = { x: number; y: number; scale: number };
-export type Shape = Rectagle | Circle;
+export type Shape = Rectagle | Circle | Line;
 
 export type PasrsedMessageType = { type: 'message'; message: Message };
