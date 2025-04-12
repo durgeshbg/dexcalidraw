@@ -105,7 +105,7 @@ export default function SignIn() {
             <Button
               type="button"
               onClick={() => {
-                setEmail('samran.vos@gmail.com');
+                setEmail('koji.walters@gmail.com');
                 setPassword('123456789');
               }}
               variant="outline"
@@ -116,7 +116,7 @@ export default function SignIn() {
             <Button
               type="button"
               onClick={() => {
-                setEmail('jesus.fuchs909@gmail.com');
+                setEmail('cheng.sokolov294@gmail.com');
                 setPassword('123456789');
               }}
               variant="outline"

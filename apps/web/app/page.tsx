@@ -32,7 +32,14 @@ export default function Home() {
             process.env.NEXT_PUBLIC_BACKEND_URL + '/users/me',
             { headers: { Authorization: `Bearer ${token}` } }
           );
-          setRooms(res.data.rooms);
+          const adminRoomsIds = res.data.adminRooms.map(
+            (room: RoomType) => room.id
+          );
+          setRooms(
+            res.data.rooms.filter(
+              (room: RoomType) => !adminRoomsIds.includes(room.id)
+            )
+          );
           setAdminRooms(res.data.adminRooms);
         } catch (e) {
           handleNetworkError(e as AxiosError);

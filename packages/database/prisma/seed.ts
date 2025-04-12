@@ -13,7 +13,7 @@ async function main() {
   const rooms: Room[] = [];
 
   const USER_COUNT = 10;
-  const ROOMS_COUNT = 3;
+  const ROOMS_COUNT = 10;
   const MESSAGES_PER_USER = 15;
   const getRandomId = (MAX_ID: number) => Math.floor(Math.random() * MAX_ID);
 
