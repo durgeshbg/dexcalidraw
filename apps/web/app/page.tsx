@@ -21,7 +21,7 @@ import {
 export default function Home() {
   const [rooms, setRooms] = React.useState<RoomType[]>([]);
   const [adminRooms, setAdminRooms] = React.useState<RoomType[]>([]);
-  const [dialogOpen, setDialogOpen] = React.useState(false); // Track dialog open state
+  const [dialogOpen, setDialogOpen] = React.useState(false);
 
   React.useEffect(() => {
     const token = localStorage.getItem('dexcalidraw-token');
@@ -54,7 +54,7 @@ export default function Home() {
           { headers: { Authorization: `Bearer ${token}` } }
         );
         setAdminRooms((prev) => [...prev, res.data.room]);
-        setDialogOpen(false); // Close the dialog on success
+        setDialogOpen(false);
         (e.target as HTMLFormElement).reset();
       } catch (e) {
         handleNetworkError(e as AxiosError);
@@ -78,7 +78,12 @@ export default function Home() {
             {rooms.length > 0 ? (
               <div className='flex flex-wrap gap-4 justify-center'>
                 {rooms.map((room: RoomType) => (
-                  <Room key={room.id} room={room} setRooms={setRooms} />
+                  <Room
+                    displayDelete={false}
+                    key={room.id}
+                    room={room}
+                    setRooms={setRooms}
+                  />
                 ))}
               </div>
             ) : (
@@ -95,7 +100,12 @@ export default function Home() {
             {adminRooms.length > 0 ? (
               <div className='flex flex-wrap gap-4 justify-center max-h-96 overflow-y-auto'>
                 {adminRooms.map((room: RoomType) => (
-                  <Room key={room.id} room={room} setRooms={setAdminRooms} />
+                  <Room
+                    displayDelete={true}
+                    key={room.id}
+                    room={room}
+                    setRooms={setAdminRooms}
+                  />
                 ))}
               </div>
             ) : (

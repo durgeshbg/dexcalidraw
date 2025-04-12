@@ -2,7 +2,13 @@ import * as React from 'react';
 import { Button } from './ui/button';
 import { redirect } from 'next/navigation';
 import { Mode, MODES, SelectedShapeType, SHAPE_TYPES } from '@/lib/types';
-import { Square, Circle, Hand, PencilIcon, RotateCcw } from 'lucide-react';
+import {
+  Square,
+  Circle,
+  Hand,
+  RotateCcw,
+  MousePointer2Icon,
+} from 'lucide-react';
 
 export interface INavbarProps {
   setSelectedShapeType?: React.Dispatch<
@@ -27,7 +33,7 @@ export default function Navbar({
   ];
 
   const modesMapping = [
-    { mode: MODES[0], icon: <PencilIcon size={20} /> },
+    { mode: MODES[0], icon: <MousePointer2Icon size={20} /> },
     { mode: MODES[1], icon: <Hand size={20} /> },
   ];
 
@@ -72,7 +78,13 @@ export default function Navbar({
         </div>
       )}
 
-      <div className='border-l-2 pl-3'>
+      <div className='border-l-2 pl-3 flex gap-3'>
+        <Button
+          onClick={() => redirect('/')}
+          className='px-4 py-2 rounded-md bg-blue-500 hover:bg-blue-400 text-white focus:ring-2 focus:ring-blue-500 transition duration-200'
+        >
+          Home
+        </Button>
         <Button
           onClick={() => {
             localStorage.removeItem('dexcalidraw-token');

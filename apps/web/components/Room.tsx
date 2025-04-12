@@ -10,6 +10,7 @@ import { toast } from 'react-toastify';
 export interface IRoomProps {
   room: RoomType;
   setRooms?: React.Dispatch<React.SetStateAction<RoomType[]>>;
+  displayDelete?: boolean;
 }
 
 export default function Room(props: IRoomProps) {
@@ -50,12 +51,14 @@ export default function Room(props: IRoomProps) {
           {props.room.name}
         </CardFooter>
 
-        <Button
-          onClick={handleDelete}
-          className='absolute top-2 right-2 bg-red-500 hover:bg-red-600 text-white w-8 h-8 flex items-center justify-center rounded-full shadow-md transition-all duration-200 ease-in-out'
-        >
-          <DeleteIcon className='w-4 h-4' />
-        </Button>
+        {props.displayDelete && (
+          <Button
+            onClick={handleDelete}
+            className='absolute top-2 right-2 bg-red-500 hover:bg-red-600 text-white w-8 h-8 flex items-center justify-center rounded-full shadow-md transition-all duration-200 ease-in-out'
+          >
+            <DeleteIcon className='w-4 h-4' />
+          </Button>
+        )}
       </Card>
     </div>
   );

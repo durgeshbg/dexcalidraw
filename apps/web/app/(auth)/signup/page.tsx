@@ -49,10 +49,12 @@ export default function SignUp() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center px-4 py-8">
-      <div className="flex items-center gap-4 mb-12">
-        <h1 className="text-5xl font-bold text-white">Decalidraw</h1>
-        <div className="flex flex-col leading-tight text-white text-sm">
+    <div className='min-h-screen flex flex-col items-center justify-center px-4 py-8 bg-black-950 text-white'>
+      <div className='flex items-center gap-4 mb-10'>
+        <h1 className='text-5xl font-bold tracking-tight text-white drop-shadow-md'>
+          Decalidraw
+        </h1>
+        <div className='flex flex-col leading-tight text-gray-300 text-xs'>
           <p>Your</p>
           <p>collaborative</p>
           <p>thinking</p>
@@ -60,53 +62,75 @@ export default function SignUp() {
         </div>
       </div>
 
-      <Card className="w-full max-w-md shadow-2xl border border-gray-800 bg-background">
+      <Card className='w-full max-w-md border border-stone-800 bg-stone-900 shadow-xl rounded-2xl'>
         <form onSubmit={handleSubmit}>
           <CardHeader>
-            <CardTitle className="text-2xl">Sign Up</CardTitle>
-            <CardDescription className="text-muted-foreground">
+            <CardTitle className='text-2xl text-white'>Sign Up</CardTitle>
+            <CardDescription className='text-sm text-stone-400'>
               Please enter your credentials to continue
             </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
+
+          <CardContent className='space-y-4'>
             <div>
-              <Label htmlFor="name">Name</Label>
+              <Label htmlFor='name' className='text-sm text-stone-300'>
+                Name
+              </Label>
               <Input
-                id="name"
+                id='name'
+                type='text'
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                type="text"
                 required
+                placeholder='John Doe'
+                className='bg-stone-800 border border-stone-700 text-white placeholder-stone-500 focus:ring-indigo-500 focus:border-indigo-500'
               />
             </div>
+
             <div>
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor='email' className='text-sm text-stone-300'>
+                Email
+              </Label>
               <Input
-                id="email"
+                id='email'
+                type='email'
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                type="email"
                 required
+                placeholder='you@example.com'
+                className='bg-stone-800 border border-stone-700 text-white placeholder-stone-500 focus:ring-indigo-500 focus:border-indigo-500'
               />
             </div>
+
             <div>
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor='password' className='text-sm text-stone-300'>
+                Password
+              </Label>
               <Input
-                id="password"
+                id='password'
+                type='password'
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                type="password"
                 required
+                placeholder='••••••••'
+                className='bg-stone-800 border border-stone-700 text-white placeholder-stone-500 focus:ring-indigo-500 focus:border-indigo-500'
               />
             </div>
           </CardContent>
-          <CardFooter className="flex flex-col gap-3 items-start">
-            <Button type="submit" className="w-full">
+
+          <CardFooter className='flex flex-col gap-3 items-start pt-2'>
+            <Button
+              type='submit'
+              className='w-full bg-indigo-600 hover:bg-indigo-500 transition text-white font-semibold'
+            >
               Create Account
             </Button>
-            <p className="text-sm text-muted-foreground">
+            <p className='text-sm text-gray-400'>
               Already have an account?{' '}
-              <Link className="underline text-primary" href="/signin">
+              <Link
+                href='/signin'
+                className='text-indigo-400 underline hover:text-indigo-300'
+              >
                 Sign In
               </Link>
             </p>

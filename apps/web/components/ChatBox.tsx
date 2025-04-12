@@ -15,6 +15,7 @@ import {
 } from '@/utils/messageServices';
 import ChatWidget from './ChatWidget';
 import MembersForm from './MembersForm';
+import { toast } from 'react-toastify';
 
 export interface IChatBoxProps {
   roomId: string;
@@ -99,6 +100,7 @@ export default function ChatBox(props: IChatBoxProps) {
       try {
         await addUserReq(userId, props.roomId, token);
         setMembers((prev) => [...prev, { id: userId, name }]);
+        toast.success('User added successfully');
       } catch (error) {
         handleNetworkError(error as AxiosError);
       }
@@ -110,6 +112,7 @@ export default function ChatBox(props: IChatBoxProps) {
       try {
         await removeUserReq(userId, props.roomId, token);
         setMembers((prev) => prev.filter((user) => user.id !== userId));
+        toast.success('User removed successfully');
       } catch (error) {
         handleNetworkError(error as AxiosError);
       }

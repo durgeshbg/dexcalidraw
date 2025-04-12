@@ -47,10 +47,12 @@ export default function SignIn() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center px-4 py-8">
-      <div className="flex items-center gap-4 mb-12">
-        <h1 className="text-5xl font-bold text-white">Decalidraw</h1>
-        <div className="flex flex-col leading-tight text-white text-sm">
+    <div className="min-h-screen flex flex-col items-center justify-center px-4 py-8 bg-black-950 text-white">
+      <div className="flex items-center gap-4 mb-10">
+        <h1 className="text-5xl font-bold tracking-tight text-white drop-shadow-md">
+          Decalidraw
+        </h1>
+        <div className="flex flex-col leading-tight text-gray-300 text-xs">
           <p>Your</p>
           <p>collaborative</p>
           <p>thinking</p>
@@ -58,38 +60,48 @@ export default function SignIn() {
         </div>
       </div>
 
-      <Card className="w-full max-w-md shadow-2xl border border-gray-800 bg-background">
+      <Card className="w-full max-w-md border border-stone-800 bg-stone-900 shadow-xl rounded-2xl">
         <form onSubmit={handleSubmit}>
           <CardHeader>
-            <CardTitle className="text-2xl">Sign In</CardTitle>
-            <CardDescription className="text-muted-foreground">
+            <CardTitle className="text-2xl text-white">Sign In</CardTitle>
+            <CardDescription className="text-sm text-gray-400">
               Please enter your credentials to continue
             </CardDescription>
           </CardHeader>
+
           <CardContent className="space-y-4">
             <div>
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email" className="text-sm text-gray-300">
+                Email
+              </Label>
               <Input
                 id="email"
+                type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                type="email"
                 required
+                className="bg-stone-800 border border-stone-700 text-white placeholder-gray-500 focus:ring-indigo-500 focus:border-indigo-500"
+                placeholder="you@example.com"
               />
             </div>
+
             <div>
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="password" className="text-sm text-gray-300">
+                Password
+              </Label>
               <Input
                 id="password"
+                type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                type="password"
                 required
+                className="bg-stone-800 border border-stone-700 text-white placeholder-gray-500 focus:ring-indigo-500 focus:border-indigo-500"
+                placeholder="••••••••"
               />
             </div>
           </CardContent>
 
-          <CardContent className="flex flex-col sm:flex-row gap-3">
+          <CardContent className="flex flex-col sm:flex-row gap-3 pt-2">
             <Button
               type="button"
               onClick={() => {
@@ -97,7 +109,7 @@ export default function SignIn() {
                 setPassword('123456789');
               }}
               variant="outline"
-              className="w-full"
+              className="w-full border-stone-700 hover:border-indigo-500 hover:text-indigo-400 transition"
             >
               Test Credentials 1
             </Button>
@@ -108,19 +120,25 @@ export default function SignIn() {
                 setPassword('123456789');
               }}
               variant="outline"
-              className="w-full"
+              className="w-full border-stone-700 hover:border-indigo-500 hover:text-indigo-400 transition"
             >
               Test Credentials 2
             </Button>
           </CardContent>
 
-          <CardFooter className="flex flex-col gap-3 items-start">
-            <Button type="submit" className="w-full">
+          <CardFooter className="flex flex-col gap-3 items-start pt-2">
+            <Button
+              type="submit"
+              className="w-full bg-indigo-600 hover:bg-indigo-500 transition text-white font-semibold"
+            >
               Sign In
             </Button>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-sm text-gray-400">
               Don&apos;t have an account?{' '}
-              <Link className="underline text-primary" href="/signup">
+              <Link
+                href="/signup"
+                className="text-indigo-400 underline hover:text-indigo-300"
+              >
                 Sign Up
               </Link>
             </p>
