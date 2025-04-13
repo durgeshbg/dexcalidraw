@@ -12,5 +12,6 @@ export type Shape = {
 };
 
 export type PasrsedMessageType =
-  | { type: 'message'; message: Message }
-  | { type: 'shape'; shape: Shape };
+  | { type: 'message'; roomId: string; message: Message }
+  | { type: 'shape'; roomId: string; shape: Shape }
+  | { type: 'delete-shape'; roomId: string; shape: Shape };

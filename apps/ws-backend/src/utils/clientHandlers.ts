@@ -1,21 +1,30 @@
 import { JwtPayload } from 'jsonwebtoken';
 import WebSocket from 'ws';
 import { PasrsedMessageType } from '../types/message';
-import { Client, Clients } from '../types/client';
+import { Rooms, Client } from '../types/client';
 
 export const addClient = (
   decoded: JwtPayload,
-  clients: Clients,
-  token: string,
+  rooms: Rooms,
+  params: { roomId: string; token: string },
   ws: WebSocket
 ) => {
-  clients.set(decoded.id, [ws, token]);
+  const room = rooms.get(params.roomId);
+  if (!room) {
+    rooms.set(params.roomId, new Map<string, Client>());
+  }
+  const clients = rooms.get(params.roomId)!;
+  clients.set(decoded.id, [ws, params.token]);
   console.log('Client connected:', decoded.id);
 };
 
-export const removeClient = (decoded: JwtPayload, clients: Clients) => {
-  clients.delete(decoded.id);
-  console.log('Client disconnected:', decoded.id);
+export const removeClient = (decoded: JwtPayload, rooms: Rooms) => {
+  rooms.forEach((clients) => {
+    if (clients.has(decoded.id)) {
+      clients.delete(decoded.id);
+      console.log('Client disconnected:', decoded.id);
+    }
+  });
 };
 
 export const sendMessage = (
