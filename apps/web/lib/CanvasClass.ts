@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { Mode, SelectedShapeType, Shape, ViewPort } from './types';
+import { v4 as uuidv4 } from 'uuid';
 
 export class CanvasClass {
   private canvas: HTMLCanvasElement | null;
@@ -36,6 +37,18 @@ export class CanvasClass {
     this.mode = mode;
   }
 
+  undo() {
+    const shape = this.Shapes.pop();
+    this.refreshCanvas();
+    this.socket?.send(
+      JSON.stringify({
+        type: 'delete-shape',
+        roomId: this.roomId,
+        shape: { data: shape },
+      })
+    );
+  }
+
   async getShapes() {
     const token = localStorage.getItem('dexcalidraw-token');
     if (token) {
@@ -47,9 +60,7 @@ export class CanvasClass {
           },
         }
       );
-      res.data.shapes.forEach((shape: { data: Shape }) => {
-        this.Shapes.push(shape.data);
-      });
+      this.Shapes = res.data.shapes.map((shape: { data: Shape }) => shape.data);
       this.refreshCanvas();
     }
   }
@@ -63,6 +74,11 @@ export class CanvasClass {
         this.Shapes.push(shape);
         this.refreshCanvas();
       }
+      if (data.type === 'delete-shape') {
+        const shape = data.shape;
+        this.Shapes = this.Shapes.filter((s) => s.uuid !== shape.data.uuid);
+        this.refreshCanvas();
+      }
     };
   }
 
@@ -73,7 +89,12 @@ export class CanvasClass {
   };
 
   mouseMoveHandler = (e: MouseEvent) => {
-    if (this.mouseDown && this.mode === 'drawing') {
+    if (
+      this.mouseDown &&
+      this.mode === 'drawing' &&
+      this.x - e.clientX !== 0 &&
+      this.y - e.clientY !== 0
+    ) {
       this.refreshCanvas();
       if (this.currentShape === 'rectangle') {
         this.ctx!.strokeRect(
@@ -117,7 +138,11 @@ export class CanvasClass {
 
   mouseUpHandler = (e: MouseEvent) => {
     this.mouseDown = false;
-    if (this.mode === 'drawing') {
+    if (
+      this.mode === 'drawing' &&
+      this.x - e.clientX !== 0 &&
+      this.y - e.clientY !== 0
+    ) {
       if (this.currentShape === 'rectangle') {
         const rectangle: Shape = {
           type: 'rectangle',
@@ -125,13 +150,14 @@ export class CanvasClass {
           y: (this.y - this.viewPorts.y) / this.viewPorts.scale,
           width: e.clientX - this.x,
           height: e.clientY - this.y,
+          uuid: uuidv4(),
         };
         this.Shapes.push(rectangle);
         this.socket?.send(
           JSON.stringify({
             type: 'shape',
+            roomId: this.roomId,
             shape: {
-              roomId: this.roomId,
               data: rectangle,
             },
           })
@@ -144,13 +170,14 @@ export class CanvasClass {
           radius: Math.sqrt(
             Math.pow(e.clientX - this.x, 2) + Math.pow(e.clientY - this.y, 2)
           ),
+          uuid: uuidv4(),
         };
         this.Shapes.push(circle);
         this.socket?.send(
           JSON.stringify({
             type: 'shape',
+            roomId: this.roomId,
             shape: {
-              roomId: this.roomId,
               data: circle,
             },
           })
@@ -162,13 +189,14 @@ export class CanvasClass {
           y: (this.y - this.viewPorts.y) / this.viewPorts.scale,
           x2: (e.clientX - this.viewPorts.x) / this.viewPorts.scale,
           y2: (e.clientY - this.viewPorts.y) / this.viewPorts.scale,
+          uuid: uuidv4(),
         };
         this.Shapes.push(line);
         this.socket?.send(
           JSON.stringify({
             type: 'shape',
+            roomId: this.roomId,
             shape: {
-              roomId: this.roomId,
               data: line,
             },
           })
