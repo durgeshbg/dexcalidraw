@@ -45,7 +45,7 @@ export type User = {
 export const SHAPE_TYPES = ['rectangle', 'circle', 'line'] as const;
 export type SelectedShapeType = (typeof SHAPE_TYPES)[number];
 
-export const MODES = ['drawing', 'pan'] as const;
+export const MODES = ['drawing', 'pan', 'erase'] as const;
 export type Mode = (typeof MODES)[number];
 
 export type ViewPort = { x: number; y: number; scale: number };

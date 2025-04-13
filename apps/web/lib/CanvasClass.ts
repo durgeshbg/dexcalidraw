@@ -38,7 +38,14 @@ export class CanvasClass {
   }
 
   undo() {
-    const shape = this.Shapes.pop();
+    this.deleteShape(this.Shapes[this.Shapes.length - 1]);
+  }
+
+  deleteShape(shape?: Shape) {
+    if (!shape) {
+      return;
+    }
+    this.Shapes = this.Shapes.filter((s) => s.uuid !== shape.uuid);
     this.refreshCanvas();
     this.socket?.send(
       JSON.stringify({
@@ -65,6 +72,41 @@ export class CanvasClass {
     }
   }
 
+  getShapeOnClick(e: MouseEvent) {
+    const x = (e.clientX - this.viewPorts.x) / this.viewPorts.scale;
+    const y = (e.clientY - this.viewPorts.y) / this.viewPorts.scale;
+    const shape = this.Shapes.find((shape) => {
+      if (shape.type === 'rectangle') {
+        return (
+          x >= shape.x &&
+          x <= shape.x + shape.width &&
+          y >= shape.y &&
+          y <= shape.y + shape.height
+        );
+      } else if (shape.type === 'circle') {
+        return (
+          Math.sqrt(Math.pow(x - shape.x, 2) + Math.pow(y - shape.y, 2)) <=
+          shape.radius
+        );
+      } else if (shape.type === 'line') {
+        const dx = shape.x2 - shape.x;
+        const dy = shape.y2 - shape.y;
+        const length = Math.sqrt(dx * dx + dy * dy);
+        const dot =
+          ((x - shape.x) * dx + (y - shape.y) * dy) / (length * length);
+        const closestX =
+          dot < 0 ? shape.x : dot > 1 ? shape.x2 : shape.x + dot * dx;
+        const closestY =
+          dot < 0 ? shape.y : dot > 1 ? shape.y2 : shape.y + dot * dy;
+        return (
+          Math.sqrt(Math.pow(x - closestX, 2) + Math.pow(y - closestY, 2)) <= 5
+        );
+      }
+      return false;
+    });
+    return shape;
+  }
+
   setSocket(socket: WebSocket) {
     this.socket = socket;
     this.socket.onmessage = (event) => {
@@ -86,6 +128,10 @@ export class CanvasClass {
     this.x = e.clientX;
     this.y = e.clientY;
     this.mouseDown = true;
+    if (this.mode === 'erase') {
+      const shape = this.getShapeOnClick(e);
+      this.deleteShape(shape);
+    }
   };
 
   mouseMoveHandler = (e: MouseEvent) => {

@@ -10,6 +10,7 @@ import {
   MousePointer2Icon,
   ChevronsLeftRightEllipsis,
   Undo2,
+  Eraser,
 } from 'lucide-react';
 
 export interface INavbarProps {
@@ -40,6 +41,7 @@ export default function Navbar({
   const modesMapping = [
     { mode: MODES[0], icon: <MousePointer2Icon size={20} /> },
     { mode: MODES[1], icon: <Hand size={20} /> },
+    { mode: MODES[2], icon: <Eraser size={20} /> },
   ];
 
   return (
@@ -74,12 +76,14 @@ export default function Navbar({
               {m.icon}
             </Button>
           ))}
-          <Button
-            onClick={resetScale}
-            className='p-2 rounded-md hover:bg-gray-700 focus:ring-2 focus:ring-blue-500 transition duration-200'
-          >
-            <RotateCcw size={20} /> Zoom
-          </Button>
+          {resetScale && (
+            <Button
+              onClick={resetScale}
+              className='p-2 rounded-md hover:bg-gray-700 focus:ring-2 focus:ring-blue-500 transition duration-200'
+            >
+              <RotateCcw size={20} /> Zoom
+            </Button>
+          )}
           {undo && (
             <Button
               onClick={undo}
