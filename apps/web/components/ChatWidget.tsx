@@ -27,7 +27,7 @@ export default function ChatWidget({
   messagesRef,
 }: IChatWidgetProps) {
   return (
-    <div className='w-96 min-h-[700px] bg-gray-800 rounded-md shadow-md p-2'>
+    <div className='w-96 min-h-[300px] lg:min-h-[500px] bg-gray-800 rounded-md shadow-md p-2'>
       <div className='flex justify-between items-center p-2 border-b-2 border-gray-700'>
         <h1 className='text-lg font-bold text-gray-100'>Chat</h1>
         <div className='flex gap-2'>
@@ -44,7 +44,7 @@ export default function ChatWidget({
           </Button>
         </div>
       </div>
-      <div ref={messagesRef} className='p-2 overflow-y-auto h-[600px]'>
+      <div ref={messagesRef} className='p-2 overflow-y-auto h-[200px] lg:h-[400px]'>
         {messages.map((message) => {
           const isUser = message.author.id === userId;
           const initials = getInitials(message.author.name);

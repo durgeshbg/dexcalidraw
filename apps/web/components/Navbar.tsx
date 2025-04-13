@@ -9,6 +9,7 @@ import {
   RotateCcw,
   MousePointer2Icon,
   ChevronsLeftRightEllipsis,
+  Undo2,
 } from 'lucide-react';
 
 export interface INavbarProps {
@@ -19,6 +20,7 @@ export interface INavbarProps {
   mode?: Mode;
   selectedShapeType?: SelectedShapeType;
   resetScale?: () => void;
+  undo?: () => void;
 }
 
 export default function Navbar({
@@ -27,6 +29,7 @@ export default function Navbar({
   mode,
   setMode,
   resetScale,
+  undo,
 }: INavbarProps) {
   const shapesMapping = [
     { shape: SHAPE_TYPES[0], icon: <Square size={20} /> },
@@ -75,8 +78,16 @@ export default function Navbar({
             onClick={resetScale}
             className='p-2 rounded-md hover:bg-gray-700 focus:ring-2 focus:ring-blue-500 transition duration-200'
           >
-            <RotateCcw size={20} />
+            <RotateCcw size={20} /> Zoom
           </Button>
+          {undo && (
+            <Button
+              onClick={undo}
+              className='p-2 rounded-md hover:bg-gray-700 focus:ring-2 focus:ring-blue-500 transition duration-200'
+            >
+              <Undo2 size={20} /> Undo
+            </Button>
+          )}
         </div>
       )}
 

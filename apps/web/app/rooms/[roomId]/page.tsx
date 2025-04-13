@@ -31,11 +31,17 @@ export default function Room() {
     }
   };
 
+  const undoHandler = () => {
+    if (canvasInstance) {
+      canvasInstance.undo();
+    }
+  };
+
   React.useEffect(() => {
     const token = localStorage.getItem('dexcalidraw-token');
     if (token) {
       const ws = new WebSocket(
-        `${process.env.NEXT_PUBLIC_WS_BACKEND_URL}?token=${token}`
+        `${process.env.NEXT_PUBLIC_WS_BACKEND_URL}?token=${token}&roomId=${roomId}`
       );
       ws.onopen = () => {
         setSocket(ws);
@@ -47,7 +53,7 @@ export default function Room() {
         setSocket(null);
       }
     };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   React.useEffect(() => {
@@ -71,6 +77,7 @@ export default function Room() {
         mode={mode}
         setMode={setMode}
         resetScale={resetScale}
+        undo={undoHandler}
       />
 
       <HomeComponent setCanvasInstance={setCanvasInstance} mode={mode} />
