@@ -9,7 +9,7 @@ import {
   removeUserFromRoom,
 } from '../controllers/rooms';
 import { getAllMessages, createMessage } from '../controllers/messages';
-import { getAllShapes, createShape, deletShape } from '../controllers/shapes';
+import { getAllShapes, createShape, deleteShape } from '../controllers/shapes';
 
 const router: Router = Router();
 
@@ -27,6 +27,6 @@ router.post('/:roomId/messages', createMessage);
 // Shapes
 router.get('/:roomId/shapes', getAllShapes);
 router.post('/:roomId/shapes', createShape);
-router.delete('/:roomId/shapes/:shapeId', deletShape);
+router.delete('/:roomId/shapes/:shapeUUID', deleteShape);
 
 export default router;

@@ -45,8 +45,8 @@ export const getAllShapes = async (req: Request, res: Response) => {
   return;
 };
 
-export const deletShape = async (req: Request, res: Response) => {
-  const { roomId, shapeId } = req.params;
+export const deleteShape = async (req: Request, res: Response) => {
+  const { roomId, shapeUUID } = req.params;
   const room = await prisma.room.findUnique({
     where: { id: roomId },
   });
@@ -54,8 +54,21 @@ export const deletShape = async (req: Request, res: Response) => {
     res.status(404).json({ error: 'Room not found' });
     return;
   }
-  const shape = await prisma.shape.delete({
-    where: { id: shapeId },
+  const shapes = await prisma.shape.findMany({
+    where: { roomId },
   });
-  res.status(200).json({ shape });
+  shapes.forEach((shape) => {
+    const parsedData = shape.data as any;
+
+    if (parsedData.uuid === shapeUUID) {
+      prisma.shape
+        .delete({
+          where: { id: shape.id },
+        })
+        .then((shape) => {
+          res.status(200).json({ shape });
+        });
+      return;
+    }
+  });
 };
