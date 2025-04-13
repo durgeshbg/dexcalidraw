@@ -57,7 +57,7 @@ export const deleteShape = async (req: Request, res: Response) => {
   const shapes = await prisma.shape.findMany({
     where: { roomId },
   });
-  shapes.forEach((shape) => {
+  shapes.forEach((shape: { id: string; data: any }) => {
     const parsedData = shape.data as any;
 
     if (parsedData.uuid === shapeUUID) {
