@@ -132,13 +132,13 @@ export default function ChatBox(props: IChatBoxProps) {
         id: userId,
         name: userName,
       },
-      roomId: props.roomId,
     };
     if (props.socket) {
       props.socket.send(
         JSON.stringify({
           type: 'message',
           message: messageObj,
+          roomId: props.roomId,
         })
       );
     }

@@ -4,6 +4,7 @@ export type Rectagle = {
   y: number;
   width: number;
   height: number;
+  uuid?: string;
 };
 
 export type Circle = {
@@ -11,6 +12,7 @@ export type Circle = {
   x: number;
   y: number;
   radius: number;
+  uuid?: string;
 };
 
 export type Line = {
@@ -19,6 +21,7 @@ export type Line = {
   y: number;
   x2: number;
   y2: number;
+  uuid?: string;
 };
 
 export type Room = {
@@ -32,7 +35,6 @@ export type Message = {
   content: string;
   createdAt: Date;
   author: User;
-  roomId: string;
 };
 
 export type User = {
