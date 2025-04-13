@@ -65,7 +65,7 @@ export const deleteShape = async (req: Request, res: Response) => {
         .delete({
           where: { id: shape.id },
         })
-        .then((shape) => {
+        .then((shape: unknown) => {
           res.status(200).json({ shape });
         });
       return;
