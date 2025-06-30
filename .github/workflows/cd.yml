@@ -1,8 +1,8 @@
-name: ci
+name: Deployt to cloud run
 
 on:
   push:
-    branches: main
+    branches: [main]
 
 jobs:
   login:
@@ -11,39 +11,51 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Login to Docker Hub
-        uses: docker/login-action@v3
+      - name: 'Gcloud Authentication'
+        uses: 'google-github-actions/auth@v2'
         with:
-          username: ${{ SECRETS.DOCKERHUB_USERNAME }}
-          password: ${{ SECRETS.DOCKERHUB_TOKEN }}
+          credentials_json: '${{ secrets.GCP_SA_KEY }}'
 
-      - name: Build and push
-        uses: docker/build-push-action@v6
+      - name: Set up Google Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
         with:
-          context: .
-          file: ./Dockerfile.backend
-          push: true
-          tags: ${{ SECRETS.DOCKERHUB_USERNAME }}/dexcalidraw-http:latest
+          service_account_key: ${{ secrets.GCP_SA_KEY }}
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
+          export_default_credentials: true
 
-      - name: Build and push
-        uses: docker/build-push-action@v6
-        with:
-          context: .
-          file: ./Dockerfile.websocket
-          push: true
-          tags: ${{ SECRETS.DOCKERHUB_USERNAME }}/dexcalidraw-ws:latest
-      - name: SSH and deploy
+      - name: Configure Docker for Artifact Registry
         run: |
-          mkdir -p ~/.ssh
-          echo "${{ SECRETS.GCP_PRIVATE_KEY }}" > ~/.ssh/dexcalidraw-key
-          chmod 600 ~/.ssh/dexcalidraw-key
-          ssh-keyscan -H ${{ SECRETS.HOST }} >> ~/.ssh/known_hosts
-          scp -i ~/.ssh/dexcalidraw-key docker-compose.yml ${{ SECRETS.USERNAME }}@${{ SECRETS.HOST }}:~/docker-compose.yml
-          ssh -i ~/.ssh/dexcalidraw-key ${{ SECRETS.USERNAME }}@${{ SECRETS.HOST }} << "EOF"
-            echo "${{ SECRETS.ENV }}" > .env
-            sudo docker compose down
-            sudo docker container prune -f
-            sudo docker image prune -af
-            sudo docker compose pull
-            sudo docker compose up -d
-          EOF
+          gcloud auth configure-docker {{ secrets.GCP_REGION }}-docker.pkg.dev --quiet
+
+      - name: Build and push Docker image for dexcalidraw-http
+        run: |
+          IMAGE_HTTP="{{ secrets.GCP_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/dexcalidraw-http/dexcalidraw-http:${{ github.sha }}"
+          docker build -t "$IMAGE_HTTP" .
+          docker push "$IMAGE"
+          echo "IMAGE_HTTP=$IMAGE_HTTP" >> $GITHUB_ENV
+
+      - name: Build and push Docker image
+        run: |
+          IMAGE_WS="{{ secrets.GCP_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/dexcalidraw-ws/dexcalidraw-ws:${{ github.sha }}"
+          docker build -t "$IMAGE_WS" .
+          docker push "$IMAGE"
+          echo "IMAGE_WS=$IMAGE_WS" >> $GITHUB_ENV
+
+      - name: Deploy to Cloud Run (HTTP)
+        run: |
+          gcloud run deploy dexcalidraw-http \
+            --image="$IMAGE_HTTP" \
+            --platform=managed \
+            --region=asia-south1 \
+            --allow-unauthenticated \
+            --timeout=300s \
+            --set-env-vars "NODE_ENV=production,DATABASE_URL=${{ secrets.DATABASE_URL }},JWT_SECRET=${{ secrets.JWT_SECRET }},HTTP_BACKEND_URL=${{ secrets.HTTP_BACKEND_URL }}"
+      - name: Deploy to Cloud Run (WebSocket)
+        run: |
+          gcloud run deploy dexcalidraw-ws \
+            --image="$IMAGE_WS" \
+            --platform=managed \
+            --region=asia-south1 \
+            --allow-unauthenticated \
+            --timeout=300s \
+            --set-env-vars "NODE_ENV=production,DATABASE_URL=${{ secrets.DATABASE_URL }},JWT_SECRET=${{ secrets.JWT_SECRET }},HTTP_BACKEND_URL=${{ secrets.HTTP_BACKEND_URL }}"
