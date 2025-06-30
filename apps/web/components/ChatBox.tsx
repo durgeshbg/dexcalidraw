@@ -2,7 +2,7 @@ import * as React from 'react';
 import { Button } from './ui/button';
 import { AxiosError } from 'axios';
 import { MessageSquareQuote } from 'lucide-react';
-import { Message, PasrsedMessageType, User } from '@/lib/types';
+import { Message, User } from '@/lib/types';
 
 import { Dialog } from '@/components/ui/dialog';
 import { handleNetworkError } from '@/lib/utils';
@@ -20,11 +20,12 @@ import { toast } from 'react-toastify';
 export interface IChatBoxProps {
   roomId: string;
   socket: WebSocket | null;
+  messages: Message[];
+  setMessages: React.Dispatch<React.SetStateAction<Message[]>>;
 }
 
 export default function ChatBox(props: IChatBoxProps) {
-  const [isOpen, setIsOpen] = React.useState(true);
-  const [messages, setMessages] = React.useState<Message[]>([]);
+  const [isOpen, setIsOpen] = React.useState(false);
   const [memebers, setMembers] = React.useState<User[]>([]);
   const [search, setSearch] = React.useState<string>('a');
   const [users, setUsers] = React.useState<User[]>([]);
@@ -48,12 +49,12 @@ export default function ChatBox(props: IChatBoxProps) {
         behavior: 'smooth',
       });
     }
-  }, [isOpen, messages]);
+  }, [isOpen, props.messages]);
 
   React.useEffect(() => {
     (async () => {
       const { messages, members } = await fetchMessages(props.roomId);
-      setMessages(messages);
+      props.setMessages(messages);
       setMembers(members);
     })();
   }, [props.roomId]);
@@ -80,19 +81,6 @@ export default function ChatBox(props: IChatBoxProps) {
       clearTimeout(timer);
     };
   }, [search]);
-
-  React.useEffect(() => {
-    if (props.socket && isOpen) {
-      props.socket.onmessage = (event) => {
-        const data: PasrsedMessageType = JSON.parse(event.data.toString());
-        if (data.type === 'message') {
-          if (data.message) {
-            setMessages((prev) => [...prev, data.message]);
-          }
-        }
-      };
-    }
-  }, [isOpen, props.socket]);
 
   const addUser = async (userId: string, name: string) => {
     const token = localStorage.getItem('dexcalidraw-token');
@@ -142,7 +130,7 @@ export default function ChatBox(props: IChatBoxProps) {
         })
       );
     }
-    setMessages((prev) => [...prev, messageObj]);
+    props.setMessages((prev) => [...prev, messageObj]);
     form.reset();
   };
 
@@ -163,7 +151,7 @@ export default function ChatBox(props: IChatBoxProps) {
             userId={userId}
             handleSubmit={handleSubmit}
             setIsOpen={setIsOpen}
-            messages={messages}
+            messages={props.messages}
             messagesRef={messagesRef}
           />
         ) : (

@@ -4,7 +4,7 @@ import ChatBox from '@/components/ChatBox';
 import HomeComponent from '@/components/HomeComponent';
 import Navbar from '@/components/Navbar';
 import { CanvasClass } from '@/lib/CanvasClass';
-import { Mode, SelectedShapeType } from '@/lib/types';
+import { Message, Mode, SelectedShapeType } from '@/lib/types';
 import { useParams } from 'next/navigation';
 import * as React from 'react';
 
@@ -12,6 +12,7 @@ export default function Room() {
   const params = useParams();
   const roomId = params?.roomId as string;
   const [socket, setSocket] = React.useState<WebSocket | null>(null);
+  const [messages, setMessages] = React.useState<Message[]>([]);
   const [canvasInstance, setCanvasInstance] = React.useState<CanvasClass>();
 
   const [selectedShapeType, setSelectedShapeType] =
@@ -80,10 +81,19 @@ export default function Room() {
         undo={undoHandler}
       />
 
-      <HomeComponent setCanvasInstance={setCanvasInstance} mode={mode} />
+      <HomeComponent
+        setMessages={setMessages}
+        setCanvasInstance={setCanvasInstance}
+        mode={mode}
+      />
 
       <div className='w-full max-w-xs bg-gray-800 rounded-lg shadow-lg'>
-        <ChatBox socket={socket} roomId={roomId} />
+        <ChatBox
+          messages={messages}
+          setMessages={setMessages}
+          socket={socket}
+          roomId={roomId}
+        />
       </div>
     </div>
   );

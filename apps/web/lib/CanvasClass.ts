@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { Mode, SelectedShapeType, Shape, ViewPort } from './types';
+import { Message, Mode, SelectedShapeType, Shape, ViewPort } from './types';
 import { v4 as uuidv4 } from 'uuid';
 
 export class CanvasClass {
@@ -14,13 +14,16 @@ export class CanvasClass {
   private socket: WebSocket | null = null;
   private mode: Mode = 'drawing';
   private viewPorts: ViewPort = { x: 0, y: 0, scale: 1 };
+  private setMessages: React.Dispatch<React.SetStateAction<Message[]>>;
 
-  constructor(canvas: HTMLCanvasElement, width: number, height: number) {
+
+  constructor(canvas: HTMLCanvasElement, width: number, height: number, setMessages: React.Dispatch<React.SetStateAction<Message[]>>) {
     this.canvas = canvas;
     this.canvas.width = width;
     this.canvas.height = height;
     this.ctx = canvas.getContext('2d');
     this.ctx!.strokeStyle = 'white';
+    this.setMessages = setMessages;
   }
 
   resetScale() {
@@ -120,6 +123,11 @@ export class CanvasClass {
         const shape = data.shape;
         this.Shapes = this.Shapes.filter((s) => s.uuid !== shape.data.uuid);
         this.refreshCanvas();
+      }
+      if(data.type === 'message') {
+        if (data.message) {
+          this.setMessages((prev) => [...prev, data.message]);
+        }
       }
     };
   }

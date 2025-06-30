@@ -1,5 +1,5 @@
 import { CanvasClass } from '@/lib/CanvasClass';
-import { Mode } from '@/lib/types';
+import { Message, Mode } from '@/lib/types';
 import * as React from 'react';
 
 export interface ICanvasProps {
@@ -7,9 +7,14 @@ export interface ICanvasProps {
     React.SetStateAction<CanvasClass | undefined>
   >;
   mode: Mode;
+  setMessages: React.Dispatch<React.SetStateAction<Message[]>>;
 }
 
-export default function Canvas({ setCanvasInstance, mode }: ICanvasProps) {
+export default function Canvas({
+  setCanvasInstance,
+  mode,
+  setMessages,
+}: ICanvasProps) {
   const canvasRef = React.useRef<HTMLCanvasElement>(null);
 
   React.useEffect(() => {
@@ -18,11 +23,12 @@ export default function Canvas({ setCanvasInstance, mode }: ICanvasProps) {
         new CanvasClass(
           canvasRef.current,
           window.innerWidth,
-          window.innerHeight
+          window.innerHeight,
+          setMessages
         )
       );
     }
-  }, [setCanvasInstance]);
+  }, [setCanvasInstance, setMessages]);
 
   return (
     <canvas
