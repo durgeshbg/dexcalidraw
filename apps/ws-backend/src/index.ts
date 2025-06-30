@@ -66,6 +66,6 @@ wss.on('connection', async function connection(ws: WebSocket, req) {
   });
 });
 
-server.listen(8080, () => {
-  console.log(`Server running on: 8080`);
+server.listen(process.env.PORT || 8080, () => {
+  console.log(`Server running on: ${process.env.PORT || 8080}`);
 });

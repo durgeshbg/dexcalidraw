@@ -2,6 +2,9 @@ import express from 'express';
 import rootRouter from './routes/index';
 import cors from 'cors';
 import logger from 'morgan';
+import { config } from 'dotenv';
+
+config();
 
 const app = express();
 app.use(cors());
@@ -10,6 +13,6 @@ app.use(logger('dev'));
 
 app.use('/api/v1', rootRouter);
 
-app.listen(3001, () => {
-  console.log('Listening on port 3001');
+app.listen(process.env.PORT || 8080, () => {
+  console.log('Listening on port ', process.env.PORT || 8080);
 });
