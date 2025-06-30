@@ -31,14 +31,14 @@ jobs:
         run: |
           IMAGE_HTTP="${{ secrets.GCP_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/dexcalidraw-http/dexcalidraw-http:${{ github.sha }}"
           docker build -t "$IMAGE_HTTP" -f Dockerfile.backend .
-          docker push "$IMAGE"
+          docker push "$IMAGE_HTTP"
           echo "IMAGE_HTTP=$IMAGE_HTTP" >> $GITHUB_ENV
 
       - name: Build and push Docker image
         run: |
           IMAGE_WS="${{ secrets.GCP_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/dexcalidraw-ws/dexcalidraw-ws:${{ github.sha }}"
           docker build -t "$IMAGE_WS" -f Dockerfile.websocket .
-          docker push "$IMAGE"
+          docker push "$IMAGE_WS"
           echo "IMAGE_WS=$IMAGE_WS" >> $GITHUB_ENV
 
       - name: Deploy to Cloud Run (HTTP)
