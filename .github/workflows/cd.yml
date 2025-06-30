@@ -49,6 +49,7 @@ jobs:
             --region=asia-south1 \
             --allow-unauthenticated \
             --timeout=300s \
+            --service-account=${{ secrets.GCP_SA_EMAIL }} \
             --set-env-vars "NODE_ENV=production,DATABASE_URL=${{ secrets.DATABASE_URL }},JWT_SECRET=${{ secrets.JWT_SECRET }},HTTP_BACKEND_URL=${{ secrets.HTTP_BACKEND_URL }}"
       - name: Deploy to Cloud Run (WebSocket)
         run: |
@@ -58,4 +59,5 @@ jobs:
             --region=asia-south1 \
             --allow-unauthenticated \
             --timeout=300s \
+            --service-account=${{ secrets.GCP_SA_EMAIL }} \
             --set-env-vars "NODE_ENV=production,DATABASE_URL=${{ secrets.DATABASE_URL }},JWT_SECRET=${{ secrets.JWT_SECRET }},HTTP_BACKEND_URL=${{ secrets.HTTP_BACKEND_URL }}"
