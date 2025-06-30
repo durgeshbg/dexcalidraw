@@ -25,18 +25,18 @@ jobs:
 
       - name: Configure Docker for Artifact Registry
         run: |
-          gcloud auth configure-docker {{ secrets.GCP_REGION }}-docker.pkg.dev --quiet
+          gcloud auth configure-docker ${{ secrets.GCP_REGION }}-docker.pkg.dev --quiet
 
       - name: Build and push Docker image for dexcalidraw-http
         run: |
-          IMAGE_HTTP="{{ secrets.GCP_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/dexcalidraw-http/dexcalidraw-http:${{ github.sha }}"
+          IMAGE_HTTP="${{ secrets.GCP_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/dexcalidraw-http/dexcalidraw-http:${{ github.sha }}"
           docker build -t "$IMAGE_HTTP" .
           docker push "$IMAGE"
           echo "IMAGE_HTTP=$IMAGE_HTTP" >> $GITHUB_ENV
 
       - name: Build and push Docker image
         run: |
-          IMAGE_WS="{{ secrets.GCP_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/dexcalidraw-ws/dexcalidraw-ws:${{ github.sha }}"
+          IMAGE_WS="${{ secrets.GCP_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/dexcalidraw-ws/dexcalidraw-ws:${{ github.sha }}"
           docker build -t "$IMAGE_WS" .
           docker push "$IMAGE"
           echo "IMAGE_WS=$IMAGE_WS" >> $GITHUB_ENV
