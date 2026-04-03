@@ -38,7 +38,7 @@ jobs:
           file: Dockerfile.backend
           push: true
           # Tag with commit SHA for version tracking
-          tags: ${{ env.ECR_REGISTRY }}/${{ secrets.ECR_REPOSITORY_BACKEND }}:${{ env.IMAGE_TAG }}
+          tags: ${{ env.ECR_REGISTRY }}/${{ secrets.ECR_REPOSITORY_BACKEND }}:${{ github.sha }}
 
       - name: Build, tag, and push websocket image to Amazon ECR
         id: build-websocket-image
@@ -51,7 +51,7 @@ jobs:
           file: Dockerfile.websocket
           push: true
           # Tag with commit SHA for version tracking
-          tags: ${{ env.ECR_REGISTRY }}/${{ secrets.ECR_REPOSITORY_WEBSOCKET }}:${{ env.IMAGE_TAG }}
+          tags: ${{ env.ECR_REGISTRY }}/${{ secrets.ECR_REPOSITORY_WEBSOCKET }}:${{ github.sha }}
 
       - name: Deploy backend to ECS Express Mode
         uses: aws-actions/amazon-ecs-deploy-express-service@v1
@@ -64,7 +64,7 @@ jobs:
         with:
           # Required inputs
           service-name: ${{ secrets.ECS_SERVICE_BACKEND }}
-          image: ${{ env.ECR_REGISTRY }}/${{ secrets.ECR_REPOSITORY_BACKEND }}:${{ env.IMAGE_TAG }}
+          image: ${{ env.ECR_REGISTRY }}/${{ secrets.ECR_REPOSITORY_BACKEND }}:${{ github.sha }}
           execution-role-arn: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/ecsTaskExecutionRole
           infrastructure-role-arn: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/ecsInfrastructureRoleForExpressServices
 
@@ -86,7 +86,7 @@ jobs:
         with:
           # Required inputs
           service-name: ${{ secrets.ECS_SERVICE_WEBSOCKET }}
-          image: ${{ env.ECR_REGISTRY }}/${{ secrets.ECR_REPOSITORY_WEBSOCKET }}:${{ env.IMAGE_TAG }}
+          image: ${{ env.ECR_REGISTRY }}/${{ secrets.ECR_REPOSITORY_WEBSOCKET }}:${{ github.sha }}
           execution-role-arn: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/ecsTaskExecutionRole
           infrastructure-role-arn: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/ecsInfrastructureRoleForExpressServices
 
