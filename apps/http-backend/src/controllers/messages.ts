@@ -2,7 +2,7 @@ import { prisma } from '@dexcalidraw/database/client';
 import { Request, Response } from 'express';
 import z from 'zod';
 
-import { routeParam } from '../routeParams.js';
+import { routeParam } from '../routeParams';
 
 export const roomSchema = z.object({
   content: z.string(),
