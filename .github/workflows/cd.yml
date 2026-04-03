@@ -69,10 +69,12 @@ jobs:
           
           # Environment variables
           environment-variables: |
-            { "name": "NODE_ENV", "value": "production" }
-            { "name": "DATABASE_URL", "value": "${{ secrets.DATABASE_URL }}" }
-            { "name": "JWT_SECRET", "value": "${{ secrets.JWT_SECRET }}" }
-            { "name": "HTTP_BACKEND_URL", "value": "${{ secrets.HTTP_BACKEND_URL }}" }
+            [
+              { "name": "NODE_ENV", "value": "production" },
+              { "name": "DATABASE_URL", "value": "${{ secrets.DATABASE_URL }}" },
+              { "name": "JWT_SECRET", "value": "${{ secrets.JWT_SECRET }}" },
+              { "name": "HTTP_BACKEND_URL", "value": "${{ secrets.HTTP_BACKEND_URL }}" }
+            ]
 
           # Resource configuration
           task-role-arn: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/ecsTaskExecutionRole
@@ -94,10 +96,12 @@ jobs:
 
           # Environment variables
           environment-variables: |
-            { "name": "NODE_ENV", "value": "production" }
-            { "name": "DATABASE_URL", "value": "${{ secrets.DATABASE_URL }}" }
-            { "name": "JWT_SECRET", "value": "${{ secrets.JWT_SECRET }}" }
-            { "name": "HTTP_BACKEND_URL", "value": "${{ secrets.HTTP_BACKEND_URL }}" }
+            [
+              { "name": "NODE_ENV", "value": "production" },
+              { "name": "DATABASE_URL", "value": "${{ secrets.DATABASE_URL }}" },
+              { "name": "JWT_SECRET", "value": "${{ secrets.JWT_SECRET }}" },
+              { "name": "HTTP_BACKEND_URL", "value": "${{ secrets.HTTP_BACKEND_URL }}" }
+            ]
 
           # Resource configuration
           task-role-arn: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/ecsTaskExecutionRole
