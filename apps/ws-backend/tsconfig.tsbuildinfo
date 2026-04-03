@@ -1,0 +1,1 @@
+{"root":["./src/index.ts","./src/services/pushtodb.ts","./src/types/client.ts","./src/types/message.ts","./src/utils/clienthandlers.ts","./src/utils/gettokenfromurl.ts","./src/utils/verifytoken.ts"],"version":"5.8.2"}

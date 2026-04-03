@@ -2,6 +2,8 @@ import { prisma } from '@dexcalidraw/database/client';
 import { Request, Response } from 'express';
 import z from 'zod';
 
+import { routeParam } from '../routeParams.js';
+
 export const roomSchema = z.object({
   name: z.string().min(4),
 });
@@ -40,7 +42,7 @@ export const getUserRooms = async (req: Request, res: Response) => {
 };
 
 export const deleteRoom = async (req: Request, res: Response) => {
-  const { roomId } = req.params;
+  const roomId = routeParam(req.params.roomId);
 
   if (!roomId) {
     res.status(400).json({ error: 'Room ID is required' });
@@ -64,7 +66,7 @@ export const deleteRoom = async (req: Request, res: Response) => {
 };
 
 export const getRoom = async (req: Request, res: Response) => {
-  const { roomId } = req.params;
+  const roomId = routeParam(req.params.roomId);
 
   if (!roomId) {
     res.status(400).json({ error: 'Room ID is required' });
@@ -86,7 +88,7 @@ export const getRoom = async (req: Request, res: Response) => {
 };
 
 export const addUserToRoom = async (req: Request, res: Response) => {
-  const { roomId } = req.params;
+  const roomId = routeParam(req.params.roomId);
   const { userId } = req.body;
   if (!roomId) {
     res.status(400).json({ error: 'Room ID is required' });
@@ -121,7 +123,7 @@ export const addUserToRoom = async (req: Request, res: Response) => {
 };
 
 export const removeUserFromRoom = async (req: Request, res: Response) => {
-  const { roomId } = req.params;
+  const roomId = routeParam(req.params.roomId);
   const { userId } = req.body;
   if (!roomId) {
     res.status(400).json({ error: 'Room ID is required' });

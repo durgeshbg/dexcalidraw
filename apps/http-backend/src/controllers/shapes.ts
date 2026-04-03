@@ -2,12 +2,14 @@ import { prisma } from '@dexcalidraw/database/client';
 import { Request, Response } from 'express';
 import z, { any } from 'zod';
 
+import { routeParam } from '../routeParams.js';
+
 export const shapeSchema = z.object({
   data: any(),
 });
 
 export const createShape = async (req: Request, res: Response) => {
-  const { roomId } = req.params;
+  const roomId = routeParam(req.params.roomId);
   const { success, error, data } = shapeSchema.safeParse(req.body);
 
   if (!success) {
@@ -30,7 +32,7 @@ export const createShape = async (req: Request, res: Response) => {
 };
 
 export const getAllShapes = async (req: Request, res: Response) => {
-  const { roomId } = req.params;
+  const roomId = routeParam(req.params.roomId);
   const room = await prisma.room.findUnique({
     where: { id: roomId },
   });
@@ -46,7 +48,8 @@ export const getAllShapes = async (req: Request, res: Response) => {
 };
 
 export const deleteShape = async (req: Request, res: Response) => {
-  const { roomId, shapeUUID } = req.params;
+  const roomId = routeParam(req.params.roomId);
+  const shapeUUID = routeParam(req.params.shapeUUID);
   const room = await prisma.room.findUnique({
     where: { id: roomId },
   });

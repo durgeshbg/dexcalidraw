@@ -10,7 +10,7 @@ RUN pnpm install
 
 RUN pnpm run db:generate
 
-RUN pnpm dlx turbo build --filter=ws-backend
+RUN pnpm exec turbo build --filter=ws-backend
 
 EXPOSE 8080
 
