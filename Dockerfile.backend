@@ -8,9 +8,9 @@ COPY . .
 
 RUN pnpm install
 
-RUN pnpm dlx turbo build --filter=http-backend
-
 RUN pnpm run db:generate
+
+RUN pnpm dlx turbo build --filter=http-backend
 
 EXPOSE 3001
 

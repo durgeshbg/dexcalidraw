@@ -6,7 +6,7 @@
     "./client": "./dist/index.js"
   },
   "scripts": {
-    "build": "tsc -b"
+    "build": "prisma generate && tsc -b"
   },
   "keywords": [],
   "author": "",
@@ -14,10 +14,10 @@
   "description": "",
   "dependencies": {
     "@ngneat/falso": "^7.3.0",
-    "@prisma/client": "^6.4.1",
+    "@prisma/client": "6.19.3",
     "bcrypt": "^5.1.1",
     "nodemon": "^3.0.1",
-    "prisma": "^6.4.1",
+    "prisma": "6.19.3",
     "ts-node": "^10.9.2"
   },
   "devDependencies": {
