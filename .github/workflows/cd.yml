@@ -65,7 +65,7 @@ jobs:
           infrastructure-role-arn: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/ecsInfrastructureRoleForExpressServices
 
           # Container configuration
-          container-port: 3001
+          container-port: 80
           
           # Environment variables
           environment-variables: |
@@ -92,7 +92,7 @@ jobs:
           infrastructure-role-arn: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/ecsInfrastructureRoleForExpressServices
 
           # Container configuration
-          container-port: 8080
+          container-port: 80
 
           # Environment variables
           environment-variables: |
