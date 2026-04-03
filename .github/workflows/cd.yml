@@ -31,7 +31,6 @@ jobs:
         id: build-backend-image
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          IMAGE_TAG: latest
         # nosemgrep: third-party-action-not-pinned-to-commit-sha
         uses: docker/build-push-action@v6
         with:
@@ -45,7 +44,6 @@ jobs:
         id: build-websocket-image
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          IMAGE_TAG: latest
         # nosemgrep: third-party-action-not-pinned-to-commit-sha
         uses: docker/build-push-action@v6
         with:
@@ -59,7 +57,6 @@ jobs:
         uses: aws-actions/amazon-ecs-deploy-express-service@v1
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          IMAGE_TAG: latest
           NODE_ENV: production
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           JWT_SECRET: ${{ secrets.JWT_SECRET }}
@@ -82,7 +79,6 @@ jobs:
         uses: aws-actions/amazon-ecs-deploy-express-service@v1
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          IMAGE_TAG: latest
           NODE_ENV: production
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           JWT_SECRET: ${{ secrets.JWT_SECRET }}
