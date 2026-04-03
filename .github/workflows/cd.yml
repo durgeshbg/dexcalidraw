@@ -73,7 +73,7 @@ jobs:
               { "name": "NODE_ENV", "value": "production" },
               { "name": "DATABASE_URL", "value": "${{ secrets.DATABASE_URL }}" },
               { "name": "JWT_SECRET", "value": "${{ secrets.JWT_SECRET }}" },
-              { "name": "HTTP_BACKEND_URL", "value": "${{ secrets.HTTP_BACKEND_URL }}" }
+              { "name": "PORT", "value": "80" }
             ]
 
           # Resource configuration
@@ -100,7 +100,8 @@ jobs:
               { "name": "NODE_ENV", "value": "production" },
               { "name": "DATABASE_URL", "value": "${{ secrets.DATABASE_URL }}" },
               { "name": "JWT_SECRET", "value": "${{ secrets.JWT_SECRET }}" },
-              { "name": "HTTP_BACKEND_URL", "value": "${{ secrets.HTTP_BACKEND_URL }}" }
+              { "name": "HTTP_BACKEND_URL", "value": "${{ secrets.HTTP_BACKEND_URL }}" },
+              { "name": "PORT", "value": "80" }
             ]
 
           # Resource configuration
