@@ -10,10 +10,10 @@
     "start:frontend": "cd ./apps/web && pnpm run start",
     "start:http": "cd ./apps/http-backend && pnpm run start",
     "start:ws": "cd ./apps/ws-backend && pnpm run start",
-    "db:seed": "cd ./packages/database && pnpm dlx prisma db seed",
-    "db:migrate": "cd ./packages/database && pnpm dlx prisma migrate dev",
-    "db:generate": "cd ./packages/database && pnpm dlx prisma generate",
-    "db:studio": "cd ./packages/database && pnpm dlx prisma studio"
+    "db:seed": "pnpm --filter @dexcalidraw/database exec prisma db seed",
+    "db:migrate": "pnpm --filter @dexcalidraw/database exec prisma migrate dev",
+    "db:generate": "pnpm --filter @dexcalidraw/database exec prisma generate",
+    "db:studio": "pnpm --filter @dexcalidraw/database exec prisma studio"
   },
   "devDependencies": {
     "prettier": "^3.5.3",
