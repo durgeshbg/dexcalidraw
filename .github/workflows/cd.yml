@@ -1,63 +1,129 @@
-name: Deployt to cloud run
+name: Deploy to ECS Express mode
 
 on:
   push:
     branches: [main]
 
 jobs:
-  login:
+  deploy:
+    name: Deploy
     runs-on: ubuntu-latest
+    environment: production
+
+    # OIDC authentication requires write permission for id-token
+    permissions:
+      id-token: write
+      contents: read
+
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
+      - name: Checkout repo
+        uses: actions/checkout@v4
 
-      - name: 'Gcloud Authentication'
-        uses: 'google-github-actions/auth@v2'
+      # Authenticate with AWS using OIDC
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v5
         with:
-          credentials_json: '${{ secrets.GCP_SA_KEY }}'
+          aws-region: ${{ env.AWS_REGION }}
+          role-to-assume: arn:aws:iam::${{ env.AWS_ACCOUNT_ID }}:role/github-actions-ecs-role
+          role-session-name: GitHubActionsECSDeployment
 
-      - name: Set up Google Cloud SDK
-        uses: google-github-actions/setup-gcloud@v2
+      - name: Build, tag, and push backend image to Amazon ECR
+        id: build-backend-image
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        # nosemgrep: third-party-action-not-pinned-to-commit-sha
+        uses: docker/build-push-action@v6
         with:
-          service_account_key: ${{ secrets.GCP_SA_KEY }}
-          project_id: ${{ secrets.GCP_PROJECT_ID }}
-          export_default_credentials: true
+          context: .
+          file: Dockerfile.backend
+          push: true
+          # Tag with commit SHA for version tracking
+          tags: ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY_BACKEND }}:${{ env.IMAGE_TAG }}
 
-      - name: Configure Docker for Artifact Registry
-        run: |
-          gcloud auth configure-docker ${{ secrets.GCP_REGION }}-docker.pkg.dev --quiet
+      - name: Build, tag, and push websocket image to Amazon ECR
+        id: build-websocket-image
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        # nosemgrep: third-party-action-not-pinned-to-commit-sha
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: Dockerfile.websocket
+          push: true
+          # Tag with commit SHA for version tracking
+          tags: ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY_WEBSOCKET }}:${{ env.IMAGE_TAG }}
 
-      - name: Build and push Docker image for dexcalidraw-http
-        run: |
-          IMAGE_HTTP="${{ secrets.GCP_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/dexcalidraw-http/dexcalidraw-http:${{ github.sha }}"
-          docker build -t "$IMAGE_HTTP" -f Dockerfile.backend .
-          docker push "$IMAGE_HTTP"
-          echo "IMAGE_HTTP=$IMAGE_HTTP" >> $GITHUB_ENV
+      - name: Deploy backend to ECS Express Mode
+        uses: aws-actions/amazon-ecs-deploy-express-service@v1
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        with:
+          # Required inputs
+          service-name: ${{ env.ECS_SERVICE_BACKEND }}
+          image: ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY_BACKEND }}:${{ env.IMAGE_TAG }}
+          execution-role-arn: arn:aws:iam::${{ env.AWS_ACCOUNT_ID }}:role/ecsTaskExecutionRole
+          infrastructure-role-arn: arn:aws:iam::${{ env.AWS_ACCOUNT_ID }}:role/ecsInfrastructureRoleForExpressServices
 
-      - name: Build and push Docker image
-        run: |
-          IMAGE_WS="${{ secrets.GCP_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/dexcalidraw-ws/dexcalidraw-ws:${{ github.sha }}"
-          docker build -t "$IMAGE_WS" -f Dockerfile.websocket .
-          docker push "$IMAGE_WS"
-          echo "IMAGE_WS=$IMAGE_WS" >> $GITHUB_ENV
+          # Container configuration
+          container-port: 3001
 
-      - name: Deploy to Cloud Run (HTTP)
-        run: |
-          gcloud run deploy dexcalidraw-http \
-            --image="$IMAGE_HTTP" \
-            --platform=managed \
-            --region=asia-south1 \
-            --allow-unauthenticated \
-            --timeout=400s \
-            --service-account=${{ secrets.GCP_SA_EMAIL }} \
-            --set-env-vars "NODE_ENV=production,DATABASE_URL=${{ secrets.DATABASE_URL }},JWT_SECRET=${{ secrets.JWT_SECRET }},HTTP_BACKEND_URL=${{ secrets.HTTP_BACKEND_URL }}"
-      - name: Deploy to Cloud Run (WebSocket)
-        run: |
-          gcloud run deploy dexcalidraw-ws \
-            --image="$IMAGE_WS" \
-            --platform=managed \
-            --region=asia-south1 \
-            --allow-unauthenticated \
-            --timeout=400s \
-            --service-account=${{ secrets.GCP_SA_EMAIL }} \
-            --set-env-vars "NODE_ENV=production,DATABASE_URL=${{ secrets.DATABASE_URL }},JWT_SECRET=${{ secrets.JWT_SECRET }},HTTP_BACKEND_URL=${{ secrets.HTTP_BACKEND_URL }}"
+          # Resource configuration
+          task-role-arn: arn:aws:iam::${{ env.AWS_ACCOUNT_ID }}:role/ecsTaskExecutionRole
+          cluster: ${{ env.ECS_CLUSTER }}
+
+      - name: Deploy websocket to ECS Express Mode
+        uses: aws-actions/amazon-ecs-deploy-express-service@v1
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        with:
+          # Required inputs
+          service-name: ${{ env.ECS_SERVICE_WEBSOCKET }}
+          image: ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY_WEBSOCKET }}:${{ env.IMAGE_TAG }}
+          execution-role-arn: arn:aws:iam::${{ env.AWS_ACCOUNT_ID }}:role/ecsTaskExecutionRole
+          infrastructure-role-arn: arn:aws:iam::${{ env.AWS_ACCOUNT_ID }}:role/ecsInfrastructureRoleForExpressServices
+
+          # Container configuration
+          container-port: 8080
+
+          # Resource configuration
+          task-role-arn: arn:aws:iam::${{ env.AWS_ACCOUNT_ID }}:role/ecsTaskExecutionRole
+          cluster: ${{ env.ECS_CLUSTER }}
+
+      # - name: Configure Docker for Artifact Registry
+      #   run: |
+      #     gcloud auth configure-docker ${{ secrets.GCP_REGION }}-docker.pkg.dev --quiet
+      #
+      # - name: Build and push Docker image for dexcalidraw-http
+      #   run: |
+      #     IMAGE_HTTP="${{ secrets.GCP_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/dexcalidraw-http/dexcalidraw-http:${{ github.sha }}"
+      #     docker build -t "$IMAGE_HTTP" -f Dockerfile.backend .
+      #     docker push "$IMAGE_HTTP"
+      #     echo "IMAGE_HTTP=$IMAGE_HTTP" >> $GITHUB_ENV
+      #
+      # - name: Build and push Docker image
+      #   run: |
+      #     IMAGE_WS="${{ secrets.GCP_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/dexcalidraw-ws/dexcalidraw-ws:${{ github.sha }}"
+      #     docker build -t "$IMAGE_WS" -f Dockerfile.websocket .
+      #     docker push "$IMAGE_WS"
+      #     echo "IMAGE_WS=$IMAGE_WS" >> $GITHUB_ENV
+      #
+      # - name: Deploy to Cloud Run (HTTP)
+      #   run: |
+      #     gcloud run deploy dexcalidraw-http \
+      #       --image="$IMAGE_HTTP" \
+      #       --platform=managed \
+      #       --region=asia-south1 \
+      #       --allow-unauthenticated \
+      #       --timeout=400s \
+      #       --service-account=${{ secrets.GCP_SA_EMAIL }} \
+      #       --set-env-vars "NODE_ENV=production,DATABASE_URL=${{ secrets.DATABASE_URL }},JWT_SECRET=${{ secrets.JWT_SECRET }},HTTP_BACKEND_URL=${{ secrets.HTTP_BACKEND_URL }}"
+      # - name: Deploy to Cloud Run (WebSocket)
+      #   run: |
+      #     gcloud run deploy dexcalidraw-ws \
+      #       --image="$IMAGE_WS" \
+      #       --platform=managed \
+      #       --region=asia-south1 \
+      #       --allow-unauthenticated \
+      #       --timeout=400s \
+      #       --service-account=${{ secrets.GCP_SA_EMAIL }} \
+      #       --set-env-vars "NODE_ENV=production,DATABASE_URL=${{ secrets.DATABASE_URL }},JWT_SECRET=${{ secrets.JWT_SECRET }},HTTP_BACKEND_URL=${{ secrets.HTTP_BACKEND_URL }}"
