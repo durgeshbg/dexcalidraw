@@ -51,7 +51,7 @@ jobs:
           context: .
           file: Dockerfile.websocket
           push: true
-          tags: ${{ env.ECR_REGISTRY }}/${{ secrets.ECR_REPOSITORY_WEBSOCKET }}:${{ github.sha }}
+          tags: ${{ env.ECR_REGISTRY }}/${{ secrets.ECR_REPOSITORY_WS }}:${{ github.sha }}
 
       - name: Deploy backend to ECS Express Mode
         uses: aws-actions/amazon-ecs-deploy-express-service@v1
@@ -85,7 +85,7 @@ jobs:
         with:
           # Required inputs
           service-name: ${{ secrets.ECS_SERVICE_WEBSOCKET }}
-          image: ${{ env.ECR_REGISTRY }}/${{ secrets.ECR_REPOSITORY_WEBSOCKET }}:${{ github.sha }}
+          image: ${{ env.ECR_REGISTRY }}/${{ secrets.ECR_REPOSITORY_WS }}:${{ github.sha }}
           execution-role-arn: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/ecsTaskExecutionRole
           infrastructure-role-arn: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/ecsInfrastructureRoleForExpressServices
 
