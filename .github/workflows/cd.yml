@@ -27,49 +27,52 @@ jobs:
           role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/github-actions-ecs-role
           role-session-name: GitHubActionsECSDeployment
 
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
       - name: Build, tag, and push backend image to Amazon ECR
         id: build-backend-image
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-        # nosemgrep: third-party-action-not-pinned-to-commit-sha
         uses: docker/build-push-action@v6
         with:
           context: .
           file: Dockerfile.backend
           push: true
-          # Tag with commit SHA for version tracking
-          tags: ${{ env.ECR_REGISTRY }}/${{ secrets.ECR_REPOSITORY_BACKEND }}:latest
+          tags: ${{ env.ECR_REGISTRY }}/${{ secrets.ECR_REPOSITORY_BACKEND }}:${{ github.sha }}
 
       - name: Build, tag, and push websocket image to Amazon ECR
         id: build-websocket-image
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-        # nosemgrep: third-party-action-not-pinned-to-commit-sha
         uses: docker/build-push-action@v6
         with:
           context: .
           file: Dockerfile.websocket
           push: true
-          # Tag with commit SHA for version tracking
-          tags: ${{ env.ECR_REGISTRY }}/${{ secrets.ECR_REPOSITORY_WEBSOCKET }}:latest
+          tags: ${{ env.ECR_REGISTRY }}/${{ secrets.ECR_REPOSITORY_WEBSOCKET }}:${{ github.sha }}
 
       - name: Deploy backend to ECS Express Mode
         uses: aws-actions/amazon-ecs-deploy-express-service@v1
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          NODE_ENV: production
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
-          JWT_SECRET: ${{ secrets.JWT_SECRET }}
-          HTTP_BACKEND_URL: ${{ secrets.HTTP_BACKEND_URL }}
         with:
           # Required inputs
           service-name: ${{ secrets.ECS_SERVICE_BACKEND }}
-          image: ${{ env.ECR_REGISTRY }}/${{ secrets.ECR_REPOSITORY_BACKEND }}:latest
+          image: ${{ env.ECR_REGISTRY }}/${{ secrets.ECR_REPOSITORY_BACKEND }}:${{ github.sha }}
           execution-role-arn: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/ecsTaskExecutionRole
           infrastructure-role-arn: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/ecsInfrastructureRoleForExpressServices
 
           # Container configuration
           container-port: 3001
+          
+          # Environment variables
+          environment-variables: |
+            { "name": "NODE_ENV", "value": "production" }
+            { "name": "DATABASE_URL", "value": "${{ secrets.DATABASE_URL }}" }
+            { "name": "JWT_SECRET", "value": "${{ secrets.JWT_SECRET }}" }
+            { "name": "HTTP_BACKEND_URL", "value": "${{ secrets.HTTP_BACKEND_URL }}" }
 
           # Resource configuration
           task-role-arn: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/ecsTaskExecutionRole
@@ -79,59 +82,23 @@ jobs:
         uses: aws-actions/amazon-ecs-deploy-express-service@v1
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          NODE_ENV: production
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
-          JWT_SECRET: ${{ secrets.JWT_SECRET }}
-          HTTP_BACKEND_URL: ${{ secrets.HTTP_BACKEND_URL }}
         with:
           # Required inputs
           service-name: ${{ secrets.ECS_SERVICE_WEBSOCKET }}
-          image: ${{ env.ECR_REGISTRY }}/${{ secrets.ECR_REPOSITORY_WEBSOCKET }}:latest
+          image: ${{ env.ECR_REGISTRY }}/${{ secrets.ECR_REPOSITORY_WEBSOCKET }}:${{ github.sha }}
           execution-role-arn: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/ecsTaskExecutionRole
           infrastructure-role-arn: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/ecsInfrastructureRoleForExpressServices
 
           # Container configuration
           container-port: 8080
 
+          # Environment variables
+          environment-variables: |
+            { "name": "NODE_ENV", "value": "production" }
+            { "name": "DATABASE_URL", "value": "${{ secrets.DATABASE_URL }}" }
+            { "name": "JWT_SECRET", "value": "${{ secrets.JWT_SECRET }}" }
+            { "name": "HTTP_BACKEND_URL", "value": "${{ secrets.HTTP_BACKEND_URL }}" }
+
           # Resource configuration
           task-role-arn: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/ecsTaskExecutionRole
           cluster: ${{ secrets.ECS_CLUSTER }}
-
-      # - name: Configure Docker for Artifact Registry
-      #   run: |
-      #     gcloud auth configure-docker ${{ secrets.GCP_REGION }}-docker.pkg.dev --quiet
-      #
-      # - name: Build and push Docker image for dexcalidraw-http
-      #   run: |
-      #     IMAGE_HTTP="${{ secrets.GCP_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/dexcalidraw-http/dexcalidraw-http:${{ github.sha }}"
-      #     docker build -t "$IMAGE_HTTP" -f Dockerfile.backend .
-      #     docker push "$IMAGE_HTTP"
-      #     echo "IMAGE_HTTP=$IMAGE_HTTP" >> $GITHUB_ENV
-      #
-      # - name: Build and push Docker image
-      #   run: |
-      #     IMAGE_WS="${{ secrets.GCP_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/dexcalidraw-ws/dexcalidraw-ws:${{ github.sha }}"
-      #     docker build -t "$IMAGE_WS" -f Dockerfile.websocket .
-      #     docker push "$IMAGE_WS"
-      #     echo "IMAGE_WS=$IMAGE_WS" >> $GITHUB_ENV
-      #
-      # - name: Deploy to Cloud Run (HTTP)
-      #   run: |
-      #     gcloud run deploy dexcalidraw-http \
-      #       --image="$IMAGE_HTTP" \
-      #       --platform=managed \
-      #       --region=asia-south1 \
-      #       --allow-unauthenticated \
-      #       --timeout=400s \
-      #       --service-account=${{ secrets.GCP_SA_EMAIL }} \
-      #       --set-env-vars "NODE_ENV=production,DATABASE_URL=${{ secrets.DATABASE_URL }},JWT_SECRET=${{ secrets.JWT_SECRET }},HTTP_BACKEND_URL=${{ secrets.HTTP_BACKEND_URL }}"
-      # - name: Deploy to Cloud Run (WebSocket)
-      #   run: |
-      #     gcloud run deploy dexcalidraw-ws \
-      #       --image="$IMAGE_WS" \
-      #       --platform=managed \
-      #       --region=asia-south1 \
-      #       --allow-unauthenticated \
-      #       --timeout=400s \
-      #       --service-account=${{ secrets.GCP_SA_EMAIL }} \
-      #       --set-env-vars "NODE_ENV=production,DATABASE_URL=${{ secrets.DATABASE_URL }},JWT_SECRET=${{ secrets.JWT_SECRET }},HTTP_BACKEND_URL=${{ secrets.HTTP_BACKEND_URL }}"
