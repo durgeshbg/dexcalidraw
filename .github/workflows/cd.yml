@@ -77,8 +77,19 @@ jobs:
             ]
 
           # Resource configuration
+          cpu: 1024
+          memory: 2048
           task-role-arn: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/ecsTaskExecutionRole
           cluster: ${{ secrets.ECS_CLUSTER }}
+
+          # Service configuration
+          health-check-path: /api/v1/health
+          
+          # Auto-scaling configuration
+          min-task-count: 1
+          max-task-count: 1
+          auto-scaling-metric: AVERAGE_MEMORY
+          auto-scaling-target-value: 50
 
       - name: Deploy websocket to ECS Express Mode
         uses: aws-actions/amazon-ecs-deploy-express-service@v1
@@ -105,5 +116,16 @@ jobs:
             ]
 
           # Resource configuration
+          cpu: 1024
+          memory: 2048
           task-role-arn: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/ecsTaskExecutionRole
           cluster: ${{ secrets.ECS_CLUSTER }}
+
+          # Service configuration
+          health-check-path: /api/v1/health
+          
+          # Auto-scaling configuration
+          min-task-count: 1
+          max-task-count: 1
+          auto-scaling-metric: AVERAGE_MEMORY
+          auto-scaling-target-value: 50

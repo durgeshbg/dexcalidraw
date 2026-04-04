@@ -13,6 +13,10 @@ app.use(logger('dev'));
 
 app.use('/api/v1', rootRouter);
 
-app.listen(process.env.PORT || 8080, () => {
-  console.log('Listening on port ', process.env.PORT || 8080);
+app.get('/api/v1/health', (req, res) => {
+  res.status(200).json({ message: 'OK' });
+});
+
+app.listen(process.env.PORT || 3001, () => {
+  console.log('Listening on port ', process.env.PORT || 3001);
 });
