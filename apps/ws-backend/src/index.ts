@@ -66,6 +66,10 @@ wss.on('connection', async function connection(ws: WebSocket, req) {
   });
 });
 
+app.get('/api/v1/health', (req, res) => {
+  res.status(200).json({ message: 'OK' });
+});
+
 server.listen(process.env.PORT || 8080, () => {
   console.log(`Server running on: ${process.env.PORT || 8080}`);
 });

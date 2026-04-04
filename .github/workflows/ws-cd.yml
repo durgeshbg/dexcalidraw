@@ -1,4 +1,4 @@
-name: Deploy to ECS Express mode
+name: Deploy Websocket to ECS Express mode
 
 on:
   push:
@@ -6,7 +6,7 @@ on:
 
 jobs:
   deploy:
-    name: Deploy
+    name: Deploy Websocket to ECS Express mode
     runs-on: ubuntu-latest
     environment: production
 
@@ -31,19 +31,8 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
 
-      - name: Build, tag, and push backend image to Amazon ECR
-        id: build-backend-image
-        env:
-          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-        uses: docker/build-push-action@v6
-        with:
-          context: .
-          file: Dockerfile.backend
-          push: true
-          tags: ${{ env.ECR_REGISTRY }}/${{ secrets.ECR_REPOSITORY_BACKEND }}:${{ github.sha }}
-
-      - name: Build, tag, and push websocket image to Amazon ECR
-        id: build-websocket-image
+      - name: Build, tag, and push image to Amazon ECR
+        id: build-image
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         uses: docker/build-push-action@v6
@@ -53,45 +42,7 @@ jobs:
           push: true
           tags: ${{ env.ECR_REGISTRY }}/${{ secrets.ECR_REPOSITORY_WS }}:${{ github.sha }}
 
-      - name: Deploy backend to ECS Express Mode
-        uses: aws-actions/amazon-ecs-deploy-express-service@v1
-        env:
-          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-        with:
-          # Required inputs
-          service-name: ${{ secrets.ECS_SERVICE_BACKEND }}
-          image: ${{ env.ECR_REGISTRY }}/${{ secrets.ECR_REPOSITORY_BACKEND }}:${{ github.sha }}
-          execution-role-arn: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/ecsTaskExecutionRole
-          infrastructure-role-arn: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/ecsInfrastructureRoleForExpressServices
-
-          # Container configuration
-          container-port: 443
-          
-          # Environment variables
-          environment-variables: |
-            [
-              { "name": "NODE_ENV", "value": "production" },
-              { "name": "DATABASE_URL", "value": "${{ secrets.DATABASE_URL }}" },
-              { "name": "JWT_SECRET", "value": "${{ secrets.JWT_SECRET }}" },
-              { "name": "PORT", "value": "443" }
-            ]
-
-          # Resource configuration
-          cpu: 1024
-          memory: 2048
-          task-role-arn: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/ecsTaskExecutionRole
-          cluster: ${{ secrets.ECS_CLUSTER }}
-
-          # Service configuration
-          health-check-path: /api/v1/health
-          
-          # Auto-scaling configuration
-          min-task-count: 1
-          max-task-count: 1
-          auto-scaling-metric: AVERAGE_MEMORY
-          auto-scaling-target-value: 50
-
-      - name: Deploy websocket to ECS Express Mode
+      - name: Deploy to ECS Express Mode
         uses: aws-actions/amazon-ecs-deploy-express-service@v1
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
@@ -103,7 +54,7 @@ jobs:
           infrastructure-role-arn: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/ecsInfrastructureRoleForExpressServices
 
           # Container configuration
-          container-port: 443
+          container-port: 80
 
           # Environment variables
           environment-variables: |
@@ -112,7 +63,7 @@ jobs:
               { "name": "DATABASE_URL", "value": "${{ secrets.DATABASE_URL }}" },
               { "name": "JWT_SECRET", "value": "${{ secrets.JWT_SECRET }}" },
               { "name": "HTTP_BACKEND_URL", "value": "${{ secrets.HTTP_BACKEND_URL }}" },
-              { "name": "PORT", "value": "443" }
+              { "name": "PORT", "value": "80" }
             ]
 
           # Resource configuration
@@ -128,4 +79,4 @@ jobs:
           min-task-count: 1
           max-task-count: 1
           auto-scaling-metric: AVERAGE_MEMORY
-          auto-scaling-target-value: 50
+          auto-scaling-target-value: 70
