@@ -65,7 +65,7 @@ jobs:
           infrastructure-role-arn: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/ecsInfrastructureRoleForExpressServices
 
           # Container configuration
-          container-port: 80
+          container-port: 443
           
           # Environment variables
           environment-variables: |
@@ -73,7 +73,7 @@ jobs:
               { "name": "NODE_ENV", "value": "production" },
               { "name": "DATABASE_URL", "value": "${{ secrets.DATABASE_URL }}" },
               { "name": "JWT_SECRET", "value": "${{ secrets.JWT_SECRET }}" },
-              { "name": "PORT", "value": "80" }
+              { "name": "PORT", "value": "443" }
             ]
 
           # Resource configuration
@@ -103,7 +103,7 @@ jobs:
           infrastructure-role-arn: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/ecsInfrastructureRoleForExpressServices
 
           # Container configuration
-          container-port: 80
+          container-port: 443
 
           # Environment variables
           environment-variables: |
@@ -112,7 +112,7 @@ jobs:
               { "name": "DATABASE_URL", "value": "${{ secrets.DATABASE_URL }}" },
               { "name": "JWT_SECRET", "value": "${{ secrets.JWT_SECRET }}" },
               { "name": "HTTP_BACKEND_URL", "value": "${{ secrets.HTTP_BACKEND_URL }}" },
-              { "name": "PORT", "value": "80" }
+              { "name": "PORT", "value": "443" }
             ]
 
           # Resource configuration
