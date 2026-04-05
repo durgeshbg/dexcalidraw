@@ -14,7 +14,6 @@ import {
   Pencil,
   Undo2,
   Eraser,
-  House,
   LogOut,
   ChevronDown,
 } from 'lucide-react';
@@ -42,8 +41,8 @@ export default function Navbar({
   undo,
 }: INavbarProps) {
   const router = useRouter();
-  const [open, setOpen] = React.useState(false);
-  const toolsId = React.useId();
+  const [moreOpen, setMoreOpen] = React.useState(true);
+  const moreId = React.useId();
 
   const shapesMapping = [
     { shape: SHAPE_TYPES[0], label: 'Rectangle', icon: Square },
@@ -57,53 +56,66 @@ export default function Navbar({
     { mode: MODES[2], label: 'Erase', icon: Eraser },
   ];
 
+  const hasCanvasTools = Boolean(setSelectedShapeType || setMode);
+  const hasCollapsibleMore = Boolean(setMode);
+
   return (
     <div
       className={cn(
-        'fixed left-3 top-3 z-50 max-w-[calc(100vw-1.5rem)]',
+        'fixed left-3 top-3 z-50 w-fit max-w-[min(13.5rem,calc(100vw-1.5rem))]',
         'rounded-2xl border border-stone-600/50 bg-stone-900/95 text-stone-100 shadow-md backdrop-blur-sm'
       )}
     >
-      <div className='flex items-center gap-2 px-3 py-2 justify-between'>
-        <span className='text-sm font-semibold tracking-tight text-stone-100'>
-          Dexcalidraw
-        </span>
-        <Button
-          type='button'
-          variant='ghost'
-          size='icon'
-          className='size-8 shrink-0 text-stone-400 hover:bg-stone-800 hover:text-stone-100'
-          aria-expanded={open}
-          aria-controls={toolsId}
-          aria-label={open ? 'Collapse toolbar' : 'Expand toolbar'}
-          onClick={() => setOpen((v) => !v)}
-        >
-          <ChevronDown
-            className={cn(
-              'size-4 transition-transform duration-300 ease-out',
-              open && 'rotate-180'
-            )}
-          />
-        </Button>
-      </div>
-
-      <div
-        className={cn(
-          'grid transition-[grid-template-rows] duration-300 ease-out',
-          open ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'
-        )}
-      >
-        <div className='min-h-0 overflow-hidden'>
-          <div
-            id={toolsId}
-            className={cn(
-              'flex flex-col gap-3 border-t border-stone-700/60 px-3 pb-3 pt-2 transition-opacity duration-300 ease-out',
-              open ? 'opacity-100' : 'pointer-events-none opacity-0'
-            )}
+      <div className='flex flex-col gap-3 px-2.5 py-4'>
+        <div className='flex items-center justify-between gap-2'>
+          <button
+            type='button'
+            onClick={() => router.push('/')}
+            className='min-w-0 shrink text-left text-sm font-semibold tracking-tight text-stone-100 underline-offset-2 transition-colors hover:text-teal-200 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500/50'
           >
+            Dexcalidraw
+          </button>
+          <div className='flex shrink-0 items-center gap-0.5'>
+            {hasCanvasTools && hasCollapsibleMore && (
+              <Button
+                type='button'
+                variant='ghost'
+                size='icon'
+                className='size-10 shrink-0 text-stone-400 hover:bg-stone-800 hover:text-stone-100'
+                aria-expanded={moreOpen}
+                aria-controls={moreId}
+                aria-label={moreOpen ? 'Hide more tools' : 'Show more tools'}
+                onClick={() => setMoreOpen((v) => !v)}
+              >
+                <ChevronDown
+                  className={cn(
+                    'size-4 transition-transform duration-300 ease-out',
+                    moreOpen && 'rotate-180'
+                  )}
+                />
+              </Button>
+            )}
+            <Button
+              type='button'
+              variant='ghost'
+              size='icon'
+              aria-label='Sign out'
+              className='size-10 shrink-0 text-stone-400 hover:bg-red-950/40 hover:text-red-300'
+              onClick={() => {
+                localStorage.removeItem('dexcalidraw-token');
+                router.push('/signin');
+              }}
+            >
+              <LogOut className='size-4' />
+            </Button>
+          </div>
+        </div>
+
+        {hasCanvasTools && (
+          <>
             {setSelectedShapeType && (
               <div
-                className='flex flex-wrap gap-1.5'
+                className='flex flex-wrap gap-1.5 ml-3'
                 role='toolbar'
                 aria-label='Shapes'
               >
@@ -120,7 +132,7 @@ export default function Navbar({
                       aria-label={s.label}
                       aria-pressed={isOn}
                       className={cn(
-                        'size-9 text-stone-300 hover:bg-stone-800 hover:text-stone-100',
+                        'size-10 text-stone-300 hover:bg-stone-800 hover:text-stone-100',
                         isOn && activeToolClass
                       )}
                       onClick={() => setSelectedShapeType(s.shape)}
@@ -135,93 +147,79 @@ export default function Navbar({
             {setMode && (
               <div
                 className={cn(
-                  'flex flex-wrap gap-1.5',
-                  setSelectedShapeType && 'border-t border-stone-700/60 pt-3'
+                  'grid transition-[grid-template-rows] duration-300 ease-out',
+                  moreOpen ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'
                 )}
-                role='toolbar'
-                aria-label='Tools'
               >
-                {modesMapping.map((m) => {
-                  const Icon = m.icon;
-                  const isOn = mode === m.mode;
-                  return (
-                    <Button
-                      key={m.mode}
-                      type='button'
-                      variant='ghost'
-                      size='icon'
-                      aria-label={m.label}
-                      aria-pressed={isOn}
-                      className={cn(
-                        'size-9 text-stone-300 hover:bg-stone-800 hover:text-stone-100',
-                        isOn && activeToolClass
-                      )}
-                      onClick={() => setMode(m.mode)}
+                <div className='min-h-0 overflow-hidden'>
+                  <div
+                    id={moreId}
+                    className={cn(
+                      'flex flex-col gap-2 border-t border-stone-700/60 pt-3 transition-opacity duration-300 ease-out',
+                      moreOpen
+                        ? 'opacity-100'
+                        : 'pointer-events-none opacity-0'
+                    )}
+                  >
+                    <div
+                      className='flex flex-wrap gap-1.5 ml-3'
+                      role='toolbar'
+                      aria-label='Tools'
                     >
-                      <Icon className='size-4' />
-                    </Button>
-                  );
-                })}
-                {resetScale && (
-                  <Button
-                    type='button'
-                    variant='ghost'
-                    size='icon'
-                    aria-label='Reset zoom'
-                    className='size-9 text-stone-300 hover:bg-stone-800 hover:text-stone-100'
-                    onClick={resetScale}
-                  >
-                    <RotateCcw className='size-4' />
-                  </Button>
-                )}
-                {undo && (
-                  <Button
-                    type='button'
-                    variant='ghost'
-                    size='icon'
-                    aria-label='Undo'
-                    className='size-9 text-stone-300 hover:bg-stone-800 hover:text-stone-100'
-                    onClick={undo}
-                  >
-                    <Undo2 className='size-4' />
-                  </Button>
-                )}
+                      {modesMapping.map((m) => {
+                        const Icon = m.icon;
+                        const isOn = mode === m.mode;
+                        return (
+                          <Button
+                            key={m.mode}
+                            type='button'
+                            variant='ghost'
+                            size='icon'
+                            aria-label={m.label}
+                            aria-pressed={isOn}
+                            className={cn(
+                              'size-10 text-stone-300 hover:bg-stone-800 hover:text-stone-100',
+                              isOn && activeToolClass
+                            )}
+                            onClick={() => setMode(m.mode)}
+                          >
+                            <Icon className='size-4' />
+                          </Button>
+                        );
+                      })}
+                    </div>
+                    <div className='flex flex-wrap gap-1.5 ml-3'>
+                      {resetScale && (
+                        <Button
+                          type='button'
+                          variant='ghost'
+                          size='icon'
+                          aria-label='Reset zoom'
+                          className='size-10 text-stone-300 hover:bg-stone-800 hover:text-stone-100'
+                          onClick={resetScale}
+                        >
+                          <RotateCcw className='size-4' />
+                        </Button>
+                      )}
+                      {undo && (
+                        <Button
+                          type='button'
+                          variant='ghost'
+                          size='icon'
+                          aria-label='Undo'
+                          className='size-10 text-stone-300 hover:bg-stone-800 hover:text-stone-100'
+                          onClick={undo}
+                        >
+                          <Undo2 className='size-4' />
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+                </div>
               </div>
             )}
-
-            <div
-              className={cn(
-                'flex flex-wrap gap-1.5',
-                (setSelectedShapeType || setMode) &&
-                  'border-t border-stone-700/60 pt-3'
-              )}
-            >
-              <Button
-                type='button'
-                variant='ghost'
-                size='icon'
-                aria-label='Home'
-                className='size-9 text-stone-300 hover:bg-stone-800 hover:text-stone-100'
-                onClick={() => router.push('/')}
-              >
-                <House className='size-4' />
-              </Button>
-              <Button
-                type='button'
-                variant='ghost'
-                size='icon'
-                aria-label='Sign out'
-                className='size-9 text-stone-400 hover:bg-red-950/40 hover:text-red-300'
-                onClick={() => {
-                  localStorage.removeItem('dexcalidraw-token');
-                  router.push('/signin');
-                }}
-              >
-                <LogOut className='size-4' />
-              </Button>
-            </div>
-          </div>
-        </div>
+          </>
+        )}
       </div>
     </div>
   );

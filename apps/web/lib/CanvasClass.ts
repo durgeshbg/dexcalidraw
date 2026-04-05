@@ -30,8 +30,11 @@ export class CanvasClass {
     if (!this.ctx) {
       return;
     }
-    this.ctx.strokeStyle = 'white';
+    this.ctx.strokeStyle = '#D6D6D6';
     this.ctx.lineWidth = 1.2;
+    this.ctx.lineCap = 'round';
+    this.ctx.lineJoin = 'round';
+    this.ctx.miterLimit = 10;
   }
 
   resize(width: number, height: number) {

@@ -86,13 +86,13 @@ export default function Home() {
             Your Rooms
           </h1>
 
-          <div className='space-y-10'>
+          <div className='grid gap-6 lg:grid-cols-2 lg:items-start'>
             <div className={panelClass}>
               <h2 className='mb-4 text-center text-lg font-medium text-stone-200'>
                 As a Member
               </h2>
               {rooms.length > 0 ? (
-                <div className='flex flex-wrap justify-center gap-4'>
+                <div className='grid gap-2 sm:grid-cols-2'>
                   {rooms.map((room: RoomType) => (
                     <Room
                       displayDelete={false}
@@ -114,7 +114,7 @@ export default function Home() {
                 As an Admin
               </h2>
               {adminRooms.length > 0 ? (
-                <div className='flex max-h-96 flex-wrap justify-center gap-4 overflow-y-auto'>
+                <div className='grid max-h-96 min-h-0 gap-2 overflow-y-auto overscroll-contain sm:grid-cols-2'>
                   {adminRooms.map((room: RoomType) => (
                     <Room
                       displayDelete={true}
