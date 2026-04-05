@@ -22,8 +22,34 @@ export class CanvasClass {
     this.canvas.width = width;
     this.canvas.height = height;
     this.ctx = canvas.getContext('2d');
-    this.ctx!.strokeStyle = 'white';
+    this.applyDrawingStyle();
     this.setMessages = setMessages;
+  }
+
+  private applyDrawingStyle() {
+    if (!this.ctx) {
+      return;
+    }
+    this.ctx.strokeStyle = 'white';
+    this.ctx.lineWidth = 1.2;
+  }
+
+  resize(width: number, height: number) {
+    if (!this.canvas || width <= 0 || height <= 0) {
+      return;
+    }
+    this.canvas.width = width;
+    this.canvas.height = height;
+    this.applyDrawingStyle();
+    this.refreshCanvas();
+  }
+
+  private pointerCanvasCoords(e: MouseEvent | WheelEvent) {
+    const rect = this.canvas!.getBoundingClientRect();
+    return {
+      x: e.clientX - rect.left,
+      y: e.clientY - rect.top,
+    };
   }
 
   resetScale() {
@@ -76,8 +102,9 @@ export class CanvasClass {
   }
 
   getShapeOnClick(e: MouseEvent) {
-    const x = (e.clientX - this.viewPorts.x) / this.viewPorts.scale;
-    const y = (e.clientY - this.viewPorts.y) / this.viewPorts.scale;
+    const { x: px, y: py } = this.pointerCanvasCoords(e);
+    const x = (px - this.viewPorts.x) / this.viewPorts.scale;
+    const y = (py - this.viewPorts.y) / this.viewPorts.scale;
     const shape = this.Shapes.find((shape) => {
       if (shape.type === 'rectangle') {
         return (
@@ -133,8 +160,9 @@ export class CanvasClass {
   }
 
   mouseDownHandler = (e: MouseEvent) => {
-    this.x = e.clientX;
-    this.y = e.clientY;
+    const { x, y } = this.pointerCanvasCoords(e);
+    this.x = x;
+    this.y = y;
     this.mouseDown = true;
     if (this.mode === 'erase') {
       const shape = this.getShapeOnClick(e);
@@ -143,19 +171,20 @@ export class CanvasClass {
   };
 
   mouseMoveHandler = (e: MouseEvent) => {
+    const { x: cx, y: cy } = this.pointerCanvasCoords(e);
     if (
       this.mouseDown &&
       this.mode === 'drawing' &&
-      this.x - e.clientX !== 0 &&
-      this.y - e.clientY !== 0
+      this.x - cx !== 0 &&
+      this.y - cy !== 0
     ) {
       this.refreshCanvas();
       if (this.currentShape === 'rectangle') {
         this.ctx!.strokeRect(
           (this.x - this.viewPorts.x) / this.viewPorts.scale,
           (this.y - this.viewPorts.y) / this.viewPorts.scale,
-          e.clientX - this.x,
-          e.clientY - this.y
+          cx - this.x,
+          cy - this.y
         );
       } else if (this.currentShape === 'circle') {
         this.ctx!.beginPath();
@@ -163,7 +192,7 @@ export class CanvasClass {
           (this.x - this.viewPorts.x) / this.viewPorts.scale,
           (this.y - this.viewPorts.y) / this.viewPorts.scale,
           Math.sqrt(
-            Math.pow(e.clientX - this.x, 2) + Math.pow(e.clientY - this.y, 2)
+            Math.pow(cx - this.x, 2) + Math.pow(cy - this.y, 2)
           ),
           0,
           2 * Math.PI
@@ -176,34 +205,35 @@ export class CanvasClass {
           (this.y - this.viewPorts.y) / this.viewPorts.scale
         );
         this.ctx!.lineTo(
-          (e.clientX - this.viewPorts.x) / this.viewPorts.scale,
-          (e.clientY - this.viewPorts.y) / this.viewPorts.scale
+          (cx - this.viewPorts.x) / this.viewPorts.scale,
+          (cy - this.viewPorts.y) / this.viewPorts.scale
         );
         this.ctx!.stroke();
       }
     } else if (this.mouseDown && this.mode === 'pan') {
-      this.viewPorts.x += e.clientX - this.x;
-      this.viewPorts.y += e.clientY - this.y;
-      this.x = e.clientX;
-      this.y = e.clientY;
+      this.viewPorts.x += cx - this.x;
+      this.viewPorts.y += cy - this.y;
+      this.x = cx;
+      this.y = cy;
       this.refreshCanvas();
     }
   };
 
   mouseUpHandler = (e: MouseEvent) => {
+    const { x: cx, y: cy } = this.pointerCanvasCoords(e);
     this.mouseDown = false;
     if (
       this.mode === 'drawing' &&
-      this.x - e.clientX !== 0 &&
-      this.y - e.clientY !== 0
+      this.x - cx !== 0 &&
+      this.y - cy !== 0
     ) {
       if (this.currentShape === 'rectangle') {
         const rectangle: Shape = {
           type: 'rectangle',
           x: (this.x - this.viewPorts.x) / this.viewPorts.scale,
           y: (this.y - this.viewPorts.y) / this.viewPorts.scale,
-          width: e.clientX - this.x,
-          height: e.clientY - this.y,
+          width: cx - this.x,
+          height: cy - this.y,
           uuid: uuidv4(),
         };
         this.Shapes.push(rectangle);
@@ -222,7 +252,7 @@ export class CanvasClass {
           x: (this.x - this.viewPorts.x) / this.viewPorts.scale,
           y: (this.y - this.viewPorts.y) / this.viewPorts.scale,
           radius: Math.sqrt(
-            Math.pow(e.clientX - this.x, 2) + Math.pow(e.clientY - this.y, 2)
+            Math.pow(cx - this.x, 2) + Math.pow(cy - this.y, 2)
           ),
           uuid: uuidv4(),
         };
@@ -241,8 +271,8 @@ export class CanvasClass {
           type: 'line',
           x: (this.x - this.viewPorts.x) / this.viewPorts.scale,
           y: (this.y - this.viewPorts.y) / this.viewPorts.scale,
-          x2: (e.clientX - this.viewPorts.x) / this.viewPorts.scale,
-          y2: (e.clientY - this.viewPorts.y) / this.viewPorts.scale,
+          x2: (cx - this.viewPorts.x) / this.viewPorts.scale,
+          y2: (cy - this.viewPorts.y) / this.viewPorts.scale,
           uuid: uuidv4(),
         };
         this.Shapes.push(line);
@@ -265,10 +295,12 @@ export class CanvasClass {
     let newScale = previousScale + e.deltaY * -0.001;
     newScale = Math.max(0.09, newScale);
 
+    const { x: mx, y: my } = this.pointerCanvasCoords(e);
+
     const newX =
-      e.clientX - (e.clientX - this.viewPorts.x) * (newScale / previousScale);
+      mx - (mx - this.viewPorts.x) * (newScale / previousScale);
     const newY =
-      e.clientY - (e.clientY - this.viewPorts.y) * (newScale / previousScale);
+      my - (my - this.viewPorts.y) * (newScale / previousScale);
 
     this.viewPorts.x = newX;
     this.viewPorts.y = newY;

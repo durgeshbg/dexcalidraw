@@ -71,7 +71,7 @@ export default function Room() {
   }, [selectedShapeType, canvasInstance, mode]);
 
   return (
-    <div className='flex min-h-screen flex-col items-center justify-start bg-stone-900 pt-20 text-stone-100'>
+    <div className='relative h-[100dvh] w-full overflow-hidden bg-stone-900 text-stone-100'>
       <Navbar
         selectedShapeType={selectedShapeType}
         setSelectedShapeType={setSelectedShapeType}
