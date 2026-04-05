@@ -71,7 +71,7 @@ export default function Room() {
   }, [selectedShapeType, canvasInstance, mode]);
 
   return (
-    <div className='flex flex-col items-center justify-start min-h-screen bg-stone-900'>
+    <div className='flex min-h-screen flex-col items-center justify-start bg-stone-900 pt-20 text-stone-100'>
       <Navbar
         selectedShapeType={selectedShapeType}
         setSelectedShapeType={setSelectedShapeType}
@@ -87,14 +87,12 @@ export default function Room() {
         mode={mode}
       />
 
-      <div className='w-full max-w-xs bg-gray-800 rounded-lg shadow-lg'>
-        <ChatBox
-          messages={messages}
-          setMessages={setMessages}
-          socket={socket}
-          roomId={roomId}
-        />
-      </div>
+      <ChatBox
+        messages={messages}
+        setMessages={setMessages}
+        socket={socket}
+        roomId={roomId}
+      />
     </div>
   );
 }

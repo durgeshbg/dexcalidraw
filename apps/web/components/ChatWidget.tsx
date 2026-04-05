@@ -4,6 +4,7 @@ import { Button } from './ui/button';
 import { Minimize2, SendHorizonal, UserPlus } from 'lucide-react';
 import { Input } from './ui/input';
 import { Message } from '@/lib/types';
+import { cn } from '@/lib/utils';
 
 export interface IChatWidgetProps {
   userId: string;
@@ -13,9 +14,12 @@ export interface IChatWidgetProps {
   messagesRef: React.RefObject<HTMLDivElement | null>;
 }
 
+const sendBtnClass =
+  'shrink-0 rounded-xl bg-teal-600/90 text-white hover:bg-teal-500/90 focus-visible:ring-2 focus-visible:ring-teal-500/40';
+
 function getInitials(name: string) {
   const names = name.split(' ');
-  const initials = names.map(n => n.charAt(0).toUpperCase()).join('');
+  const initials = names.map((n) => n.charAt(0).toUpperCase()).join('');
   return initials.slice(0, 2);
 }
 
@@ -27,44 +31,58 @@ export default function ChatWidget({
   messagesRef,
 }: IChatWidgetProps) {
   return (
-    <div className='w-96 min-h-[300px] lg:min-h-[500px] bg-gray-800 rounded-md shadow-md p-2'>
-      <div className='flex justify-between items-center p-2 border-b-2 border-gray-700'>
-        <h1 className='text-lg font-bold text-gray-100'>Chat</h1>
-        <div className='flex gap-2'>
+    <div className='min-h-[300px] w-96 rounded-2xl border border-stone-600/50 bg-stone-900/95 p-2 shadow-sm backdrop-blur-sm transition-colors lg:min-h-[500px]'>
+      <div className='flex items-center justify-between border-b border-stone-700/60 p-2'>
+        <h2 className='text-sm font-semibold text-stone-100'>Chat</h2>
+        <div className='flex gap-1'>
           <DialogTrigger asChild>
-            <Button variant='outline' className='text-gray-300'>
-              <UserPlus />
+            <Button
+              type='button'
+              variant='ghost'
+              size='icon'
+              aria-label='Manage members'
+              className='text-stone-400 transition-colors hover:bg-stone-800 hover:text-teal-200'
+            >
+              <UserPlus className='size-4' />
             </Button>
           </DialogTrigger>
           <Button
+            type='button'
+            variant='ghost'
+            size='icon'
+            aria-label='Minimize chat'
             onClick={() => setIsOpen(false)}
-            className='bg-gray-700 text-gray-300 hover:bg-gray-600'
+            className='text-stone-400 transition-colors hover:bg-stone-800 hover:text-stone-100'
           >
-            <Minimize2 />
+            <Minimize2 className='size-4' />
           </Button>
         </div>
       </div>
-      <div ref={messagesRef} className='p-2 overflow-y-auto h-[200px] lg:h-[400px]'>
+      <div
+        ref={messagesRef}
+        className='h-[200px] overflow-y-auto p-2 lg:h-[400px]'
+      >
         {messages.map((message) => {
           const isUser = message.author.id === userId;
           const initials = getInitials(message.author.name);
           return (
             <div
               key={message.id}
-              className={`mb-2 p-2 rounded-md flex items-start gap-2 ${
+              className={cn(
+                'mb-2 flex items-start gap-2 rounded-md p-2 transition-colors',
                 isUser ? 'justify-end text-right' : 'justify-start text-left'
-              }`}
+              )}
             >
               {!isUser && (
-                <div className='w-8 h-8 flex items-center justify-center rounded-full bg-indigo-600 text-white text-sm font-bold'>
+                <div className='flex size-8 shrink-0 items-center justify-center rounded-full bg-teal-600/30 text-xs font-bold text-teal-100 ring-1 ring-teal-500/25'>
                   {initials}
                 </div>
               )}
-              <div className='bg-gray-700 text-white shadow-md p-2 rounded-md max-w-[80%]'>
+              <div className='max-w-[80%] rounded-md border border-stone-700/40 bg-stone-800/90 p-2 text-stone-100 shadow-sm transition-colors'>
                 <p className='text-sm'>{message.content}</p>
               </div>
               {isUser && (
-                <div className='w-8 h-8 flex items-center justify-center rounded-full bg-gray-600 text-white text-sm font-bold'>
+                <div className='flex size-8 shrink-0 items-center justify-center rounded-full bg-stone-700 text-sm font-bold text-stone-200'>
                   {initials}
                 </div>
               )}
@@ -76,13 +94,10 @@ export default function ChatWidget({
         <Input
           name='message'
           placeholder='Message...'
-          className='bg-gray-700 text-white placeholder-gray-400 focus:ring-2 focus:ring-indigo-500'
+          className='border-stone-600 bg-stone-950/50 text-stone-100 placeholder:text-stone-500 focus-visible:ring-2 focus-visible:ring-teal-500/40'
         />
-        <Button
-          type='submit'
-          className='bg-indigo-600 hover:bg-indigo-500 text-white'
-        >
-          <SendHorizonal />
+        <Button type='submit' size='icon' className={sendBtnClass} aria-label='Send'>
+          <SendHorizonal className='size-4' />
         </Button>
       </form>
     </div>

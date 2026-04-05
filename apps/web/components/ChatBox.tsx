@@ -1,3 +1,5 @@
+'use client';
+
 import * as React from 'react';
 import { Button } from './ui/button';
 import { AxiosError } from 'axios';
@@ -16,6 +18,7 @@ import {
 import ChatWidget from './ChatWidget';
 import MembersForm from './MembersForm';
 import { toast } from 'react-toastify';
+import { cn } from '@/lib/utils';
 
 export interface IChatBoxProps {
   roomId: string;
@@ -24,7 +27,10 @@ export interface IChatBoxProps {
   setMessages: React.Dispatch<React.SetStateAction<Message[]>>;
 }
 
+const panelAnimate = 'animate-in fade-in zoom-in-95 duration-300 ease-out';
+
 export default function ChatBox(props: IChatBoxProps) {
+  const { roomId, setMessages, messages } = props;
   const [isOpen, setIsOpen] = React.useState(false);
   const [memebers, setMembers] = React.useState<User[]>([]);
   const [search, setSearch] = React.useState<string>('a');
@@ -49,15 +55,15 @@ export default function ChatBox(props: IChatBoxProps) {
         behavior: 'smooth',
       });
     }
-  }, [isOpen, props.messages]);
+  }, [isOpen, messages]);
 
   React.useEffect(() => {
     (async () => {
-      const { messages, members } = await fetchMessages(props.roomId);
-      props.setMessages(messages);
+      const { messages, members } = await fetchMessages(roomId);
+      setMessages(messages);
       setMembers(members);
     })();
-  }, [props.roomId]);
+  }, [roomId, setMessages]);
 
   React.useEffect(() => {
     if (memebers.length > 0 && userId) {
@@ -86,7 +92,7 @@ export default function ChatBox(props: IChatBoxProps) {
     const token = localStorage.getItem('dexcalidraw-token');
     if (token) {
       try {
-        await addUserReq(userId, props.roomId, token);
+        await addUserReq(userId, roomId, token);
         setMembers((prev) => [...prev, { id: userId, name }]);
         toast.success('User added successfully');
       } catch (error) {
@@ -98,7 +104,7 @@ export default function ChatBox(props: IChatBoxProps) {
     const token = localStorage.getItem('dexcalidraw-token');
     if (token) {
       try {
-        await removeUserReq(userId, props.roomId, token);
+        await removeUserReq(userId, roomId, token);
         setMembers((prev) => prev.filter((user) => user.id !== userId));
         toast.success('User removed successfully');
       } catch (error) {
@@ -126,16 +132,16 @@ export default function ChatBox(props: IChatBoxProps) {
         JSON.stringify({
           type: 'message',
           message: messageObj,
-          roomId: props.roomId,
+          roomId,
         })
       );
     }
-    props.setMessages((prev) => [...prev, messageObj]);
+    setMessages((prev) => [...prev, messageObj]);
     form.reset();
   };
 
   return (
-    <div className='fixed bottom-4 right-2'>
+    <div className='fixed bottom-4 right-2 z-40'>
       <Dialog>
         <MembersForm
           memebers={memebers}
@@ -147,20 +153,27 @@ export default function ChatBox(props: IChatBoxProps) {
         />
 
         {isOpen ? (
-          <ChatWidget
-            userId={userId}
-            handleSubmit={handleSubmit}
-            setIsOpen={setIsOpen}
-            messages={props.messages}
-            messagesRef={messagesRef}
-          />
+          <div className={cn(panelAnimate)}>
+            <ChatWidget
+              userId={userId}
+              handleSubmit={handleSubmit}
+              setIsOpen={setIsOpen}
+              messages={messages}
+              messagesRef={messagesRef}
+            />
+          </div>
         ) : (
-          <Button
-            onClick={() => setIsOpen(true)}
-            className='bg-indigo-600 text-white hover:bg-indigo-500 rounded-full p-3 shadow-lg'
-          >
-            <MessageSquareQuote />
-          </Button>
+          <div className={cn(panelAnimate)}>
+            <Button
+              type='button'
+              size='icon'
+              aria-label='Open chat'
+              onClick={() => setIsOpen(true)}
+              className='size-12 rounded-full border border-stone-600/50 bg-stone-800/95 text-stone-200 shadow-md backdrop-blur-sm transition-all duration-300 ease-out hover:bg-teal-600/20 hover:text-teal-100'
+            >
+              <MessageSquareQuote className='size-5' />
+            </Button>
+          </div>
         )}
       </Dialog>
     </div>

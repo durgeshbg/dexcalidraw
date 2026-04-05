@@ -5,6 +5,7 @@ import { Input } from './ui/input';
 import { User } from '@/lib/types';
 import { Button } from './ui/button';
 import { Plus, Minus } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 export interface IMembersFormProps {
   memebers: User[];
@@ -24,31 +25,34 @@ export default function MembersForm({
   addUser,
 }: IMembersFormProps) {
   return (
-    <DialogContent className='sm:max-w-[500px] bg-gray-900 text-white border border-gray-800 rounded-2xl shadow-xl'>
+    <DialogContent className='rounded-2xl border border-stone-600/50 bg-stone-900 text-stone-100 sm:max-w-[500px]'>
       <DialogHeader>
-        <DialogTitle className='text-lg font-semibold text-white'>
+        <DialogTitle className='text-lg font-semibold text-stone-100'>
           Manage Members
         </DialogTitle>
       </DialogHeader>
 
       <div className='grid gap-4 py-2'>
         <div className='grid grid-cols-4 items-center gap-4'>
-          <Label htmlFor='search' className='text-right text-gray-300 text-sm'>
+          <Label
+            htmlFor='search'
+            className='text-right text-sm text-stone-300'
+          >
             Search
           </Label>
           <Input
             id='search'
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className='col-span-3 bg-gray-800 text-white placeholder-gray-500 border border-gray-700 focus:ring-indigo-500 focus:border-indigo-500 text-sm rounded-md'
+            className='col-span-3 rounded-md border border-stone-600 bg-stone-950/50 text-sm text-stone-100 placeholder:text-stone-500 focus-visible:ring-2 focus-visible:ring-teal-500/40'
             placeholder='Search users...'
           />
         </div>
       </div>
 
-      <div className='mt-4 max-h-64 overflow-y-auto space-y-2 pr-1'>
+      <div className='mt-4 max-h-64 space-y-2 overflow-y-auto pr-1'>
         {users.length === 0 ? (
-          <p className='text-gray-500 text-center text-sm'>No users found.</p>
+          <p className='text-center text-sm text-stone-500'>No users found.</p>
         ) : (
           users.map((user: User) => {
             const isMember = memebers.some((m) => m.id === user.id);
@@ -61,13 +65,13 @@ export default function MembersForm({
             return (
               <div
                 key={user.id}
-                className='flex items-center justify-between px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg hover:bg-gray-700 transition-colors duration-150'
+                className='flex items-center justify-between rounded-lg border border-stone-600/50 bg-stone-800/80 px-3 py-2 transition-colors duration-150 hover:bg-stone-800'
               >
                 <div className='flex items-center gap-3'>
-                  <div className='w-8 h-8 bg-indigo-600 text-white text-xs font-bold flex items-center justify-center rounded-full shadow-sm'>
+                  <div className='flex size-8 items-center justify-center rounded-full bg-teal-600/30 text-xs font-bold text-teal-100 ring-1 ring-teal-500/25'>
                     {initials}
                   </div>
-                  <span className='text-sm font-medium text-gray-100 truncate'>
+                  <span className='truncate text-sm font-medium text-stone-100'>
                     {user.name}
                   </span>
                 </div>
@@ -77,16 +81,18 @@ export default function MembersForm({
                   }
                   size='icon'
                   variant='ghost'
-                  className={`transition-colors duration-200 ${
+                  aria-label={isMember ? 'Remove member' : 'Add member'}
+                  className={cn(
+                    'transition-colors duration-200',
                     isMember
-                      ? 'text-rose-500 hover:text-rose-400'
-                      : 'text-gray-400 hover:text-indigo-400'
-                  }`}
+                      ? 'text-rose-400/90 hover:text-red-300'
+                      : 'text-stone-400 hover:text-teal-300'
+                  )}
                 >
                   {isMember ? (
-                    <Minus className='w-4 h-4' />
+                    <Minus className='size-4' />
                   ) : (
-                    <Plus className='w-4 h-4' />
+                    <Plus className='size-4' />
                   )}
                 </Button>
               </div>

@@ -16,7 +16,7 @@ export default function HomeComponent({
   >;
 }) {
   return (
-    <div>
+    <div className='w-full animate-in fade-in duration-500'>
       <Canvas
         setMessages={setMessages}
         mode={mode}

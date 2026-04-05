@@ -1,6 +1,9 @@
+'use client';
+
 import { CanvasClass } from '@/lib/CanvasClass';
 import { Message, Mode } from '@/lib/types';
 import * as React from 'react';
+import { cn } from '@/lib/utils';
 
 export interface ICanvasProps {
   setCanvasInstance: React.Dispatch<
@@ -32,7 +35,10 @@ export default function Canvas({
 
   return (
     <canvas
-      className={mode === 'pan' ? 'cursor-grab' : 'cursor-auto'}
+      className={cn(
+        mode === 'pan' ? 'cursor-grab' : 'cursor-auto',
+        'outline-none'
+      )}
       ref={canvasRef}
     ></canvas>
   );
