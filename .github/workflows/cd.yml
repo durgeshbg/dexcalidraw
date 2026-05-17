@@ -1,0 +1,63 @@
+name: Deploy to cloud run
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  login:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: "Gcloud Authentication"
+        uses: "google-github-actions/auth@v2"
+        with:
+          credentials_json: "${{ secrets.GCP_SA_KEY }}"
+
+      - name: Set up Google Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          service_account_key: ${{ secrets.GCP_SA_KEY }}
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
+          export_default_credentials: true
+
+      - name: Configure Docker for Artifact Registry
+        run: |
+          gcloud auth configure-docker ${{ secrets.GCP_REGION }}-docker.pkg.dev --quiet
+
+      - name: Build and push Docker image for dexcalidraw-http
+        run: |
+          IMAGE_HTTP="${{ secrets.GCP_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/dexcalidraw-http/dexcalidraw-http:${{ github.sha }}"
+          docker build -t "$IMAGE_HTTP" -f Dockerfile.backend .
+          docker push "$IMAGE_HTTP"
+          echo "IMAGE_HTTP=$IMAGE_HTTP" >> $GITHUB_ENV
+
+      - name: Build and push Docker image
+        run: |
+          IMAGE_WS="${{ secrets.GCP_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/dexcalidraw-ws/dexcalidraw-ws:${{ github.sha }}"
+          docker build -t "$IMAGE_WS" -f Dockerfile.websocket .
+          docker push "$IMAGE_WS"
+          echo "IMAGE_WS=$IMAGE_WS" >> $GITHUB_ENV
+
+      - name: Deploy to Cloud Run (HTTP)
+        run: |
+          gcloud run deploy dexcalidraw-http \
+            --image="$IMAGE_HTTP" \
+            --platform=managed \
+            --region=asia-south1 \
+            --allow-unauthenticated \
+            --timeout=400s \
+            --service-account=${{ secrets.GCP_SA_EMAIL }} \
+            --set-env-vars "NODE_ENV=production,DATABASE_URL=${{ secrets.DATABASE_URL }},JWT_SECRET=${{ secrets.JWT_SECRET }},HTTP_BACKEND_URL=${{ secrets.HTTP_BACKEND_URL }}"
+      - name: Deploy to Cloud Run (WebSocket)
+        run: |
+          gcloud run deploy dexcalidraw-ws \
+            --image="$IMAGE_WS" \
+            --platform=managed \
+            --region=asia-south1 \
+            --allow-unauthenticated \
+            --timeout=400s \
+            --service-account=${{ secrets.GCP_SA_EMAIL }} \
+            --set-env-vars "NODE_ENV=production,DATABASE_URL=${{ secrets.DATABASE_URL }},JWT_SECRET=${{ secrets.JWT_SECRET }},HTTP_BACKEND_URL=${{ secrets.HTTP_BACKEND_URL }}"
